@@ -17,6 +17,10 @@ define( 'CW_SEARCH_BASENAME', plugin_basename( __FILE__ ) );
 define( 'CW_SEARCH_DIR_URL',  plugins_url('', CW_SEARCH_BASENAME) );
 define( 'CW_SEARCH_VERSION',  0.1 );
 
+define( 'CW_SEARCH_SETTING_RESULTS_PAGE', "cws_results_page" );
+define( 'CW_SEARCH_SETTING_PREVIEW_PAGE', "cws_wiki_preview_page" );
+
+require_once( 'lib/class.cw-search.php' );
 require_once( 'lib/class.cws-admin.php' );
 require_once( 'lib/class.cws-form.php' );
 require_once( 'lib/class.cws-tags.php' );
