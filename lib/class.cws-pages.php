@@ -4,6 +4,8 @@ class Combined_Wiki_Search_Pages {
 		
 	}
 	
+	
+	
 }
 
 Combined_Wiki_Search_Pages::init();
