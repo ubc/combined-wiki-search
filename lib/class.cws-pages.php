@@ -4,13 +4,13 @@ class Combined_Wiki_Search_Pages {
 	
 	static function init() {
 		add_filter( 'the_content', array( __CLASS__, 'content' ) );
-		//add_filter( 'the_title', array( __CLASS__, 'title' ) );
-		add_filter( 'wp_title', array( __CLASS__, 'title' ) );
+		add_filter( 'the_title', array( __CLASS__, 'title' ) );
+		add_filter( 'wp_title', array( __CLASS__, 'browser_title' ) );
 		self::load();
 	}
 	
 	static function load() {
-		self::add_page( 'results', array(
+		self::add_page( CW_SEARCH_PAGE_SEARCH_RESULTS, array(
 			'title' => "Search Results",
 			'page_id' => 0,
 			'content' => function() {
@@ -20,11 +20,34 @@ class Combined_Wiki_Search_Pages {
 			},
 		) );
 		
-		self::add_page( 'wikiembed', array(
+		self::add_page( CW_SEARCH_PAGE_WIKI_EMBED, array(
 			'title' => "Wiki Viewport",
 			'page_id' => 0,
+			'browser_title' => function( $title ) {
+				$new_title = $_REQUEST['p'];
+				$new_title = str_replace( "_", " ", $new_title );
+				$new_title = explode( ":", $new_title, 2 );
+				
+				if ( count( $new_title ) > 1 ):
+					$new_title = $new_title[1];
+				else:
+					$new_title = $new_title[0];
+				endif;
+				
+				return $new_title;
+			},
 			'display_title' => function( $title ) {
-				return $_REQUEST['p'];
+				$new_title = $_REQUEST['p'];
+				$new_title = str_replace( "_", " ", $new_title );
+				$new_title = explode( ":", $new_title, 2 );
+				
+				if ( count( $new_title ) > 1 ):
+					$new_title = '<strong>['.$new_title[0].']</strong> '.$new_title[1];
+				else:
+					$new_title = $new_title[0];
+				endif;
+				
+				return $new_title;
 			},
 			'content' => function() {
 				?>
@@ -39,16 +62,40 @@ class Combined_Wiki_Search_Pages {
 		self::$pages["cws_page_".$slug] = $data;
 	}
 	
-	static function title( $title ) {
+	static function browser_title( $title ) {
 		if ( is_page() ):
 			$page_id = get_the_ID();
 			
 			foreach ( self::$pages as $slug => $data ):
 				if ( $page_id == $data['page_id'] && isset( $data['display_title'] ) ):
-					$func = $data['display_title'];
-					return $func( $title );
+					$func = $data['browser_title'];
+					$new_title = $func( $title );
 				endif;
 			endforeach;
+		endif;
+		
+		if ( ! empty( $new_title ) ):
+			$title = $new_title;
+		endif;
+		
+		return $title;
+	}
+	
+	static function title( $title ) {
+		if ( is_page() ):
+			global $post;
+			$page_id = get_the_ID();
+			
+			foreach ( self::$pages as $slug => $data ):
+				if ( $page_id == $data['page_id'] && isset( $data['display_title'] ) && $title == $post->post_title ):
+					$func = $data['display_title'];
+					$new_title = $func( $title );
+				endif;
+			endforeach;
+		endif;
+		
+		if ( ! empty( $new_title ) ):
+			$title = $new_title;
 		endif;
 		
 		return $title;
