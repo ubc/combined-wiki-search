@@ -20,11 +20,11 @@ define( 'CW_SEARCH_VERSION',  0.1 );
 define( 'CW_SEARCH_SETTING_RESULTS_PAGE', "cws_results_page" );
 define( 'CW_SEARCH_SETTING_PREVIEW_PAGE', "cws_wiki_preview_page" );
 
+require_once( 'lib/class.cws-pages.php' );
 require_once( 'lib/class.cw-search.php' );
 require_once( 'lib/class.cws-admin.php' );
 require_once( 'lib/class.cws-form.php' );
 require_once( 'lib/class.cws-tags.php' );
-require_once( 'lib/class.cws-pages.php' );
 
 // Register the activation hooks for the plugin
 register_activation_hook( __FILE__, array( 'Combined_Wiki_Search', 'install' ) );

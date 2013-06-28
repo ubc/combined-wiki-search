@@ -10,8 +10,10 @@ class Combined_Wiki_Search_Admin {
 		register_setting( 'cws_options', 'cws_wiki_preview_page');
 		
 		add_settings_section( 'cws_main', 'Main Settings', array( __CLASS__, 'setting_section_main' ), 'cws_settings' );
-		add_settings_field( CW_SEARCH_SETTING_RESULTS_PAGE, 'Results Page', array( __CLASS__, 'setting_results_page' ), 'cws_settings', 'cws_main' );
-		add_settings_field( CW_SEARCH_SETTING_PREVIEW_PAGE, 'Wiki Preview Page', array( __CLASS__, 'setting_wiki_preview_page' ), 'cws_settings', 'cws_main' );
+		
+		foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
+			add_settings_field( $slug, $data['title'], array( __CLASS__, 'setting_page' ), 'cws_settings', 'cws_main', $slug );
+		endforeach;
 	}
 	
 	static function admin_menu() {
@@ -24,19 +26,10 @@ class Combined_Wiki_Search_Admin {
 		<?php
 	}
 	
-	static function setting_results_page() {
+	static function setting_page( $slug ) {
 		wp_dropdown_pages( array(
-			'selected' => Combined_Wiki_Search::$results_page_id,
-			'name' => CW_SEARCH_SETTING_RESULTS_PAGE,
-			'show_option_none' => "None",
-			'option_none_value' => 0,
-		) );
-	}
-	
-	static function setting_wiki_preview_page() {
-		wp_dropdown_pages( array(
-			'selected' => Combined_Wiki_Search::$wikiembed_page_id,
-			'name' => CW_SEARCH_SETTING_PREVIEW_PAGE,
+			'selected' => Combined_Wiki_Search_Pages::$pages[$slug]['page_id'],
+			'name' => $slug,
 			'show_option_none' => "None",
 			'option_none_value' => 0,
 		) );
@@ -44,11 +37,11 @@ class Combined_Wiki_Search_Admin {
 	
 	static function admin_page() {
 		if ( ! empty( $_POST ) ):
-			Combined_Wiki_Search::$results_page_id = ( isset( $_POST[CW_SEARCH_SETTING_RESULTS_PAGE] ) ? $_POST[CW_SEARCH_SETTING_RESULTS_PAGE] : 0 );
-			Combined_Wiki_Search::$wikiembed_page_id = ( isset( $_POST[CW_SEARCH_SETTING_PREVIEW_PAGE] ) ? $_POST[CW_SEARCH_SETTING_PREVIEW_PAGE] : 0 );
-			
-			update_site_option( CW_SEARCH_SETTING_RESULTS_PAGE, Combined_Wiki_Search::$results_page_id );
-			update_site_option( CW_SEARCH_SETTING_PREVIEW_PAGE, Combined_Wiki_Search::$wikiembed_page_id );
+			foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
+				$value = ( isset( $_POST[$slug] ) ? $_POST[$slug] : 0 );
+				Combined_Wiki_Search_Pages::$pages[$slug]['page_id'] = $value;
+				update_site_option( $slug, $value );
+			endforeach;
 		endif;
 		?>
 		<div class="wrap">
