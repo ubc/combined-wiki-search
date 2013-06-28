@@ -20,6 +20,7 @@ class Combined_Wiki_Search_Tags {
 	static function create_area() {
 		?>
 		<h3>Tag Space</h3>
+		<a href="#" class="btn" data="<?php echo esc_url(self::get_tags()); ?>">CLICK ME</a>
 		<?php
 	}
 
@@ -29,8 +30,9 @@ class Combined_Wiki_Search_Tags {
 	@return array
 	*/
 	static function get_tags() {
-		$tags = new Array();
-		
+		$tags = "http://wiki.ubc.ca/Documentation:UBC_Content_Management_System/UBC_Collab_Theme";
+		//$tags = $test;
+
 		return $tags;
 	}
 
