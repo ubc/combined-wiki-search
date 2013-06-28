@@ -2,10 +2,12 @@
 class Combined_Wiki_Search {
 	static $results_page_id = 0;
 	static $wikiembed_page_id = 0;
+	static $wiki_url = null;
 	
 	static function init() {
 		self::$results_page_id = get_site_option( CW_SEARCH_SETTING_RESULTS_PAGE, 0 );
 		self::$wikiembed_page_id = get_site_option( CW_SEARCH_SETTING_PREVIEW_PAGE, 0 );
+		self::$wiki_url = "http://wiki.ubc.ca/";
 	}
 	
 	static function install() {
