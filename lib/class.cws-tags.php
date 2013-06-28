@@ -3,8 +3,16 @@ class Combined_Wiki_Search_Tags {
 
 	static function init() {
 		add_shortcode( 'cws_tags', array( __CLASS__, 'tags_shortcode' ) );
+		add_action( 'init', array( __CLASS__, 'register_scripts' ) );
+		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts' ) );
 	}
 	
+	/**
+	tags_shortcode function
+	This is the controlling function called in the constructor that will handle
+	the functionality for the shortcode
+	@return buffer
+	*/
 	static function tags_shortcode() {
 		ob_start();
 		self::create_area();
@@ -14,13 +22,29 @@ class Combined_Wiki_Search_Tags {
 	}
 
 	/**
+	register_scripts function
+	This function will register the handles for the javascript files needed
+	*/
+	static function register_scripts() {
+		wp_register_script( 'cws-tags' , trailingslashit( CW_SEARCH_DIR_URL ) . 'js/tags.js', array( 'jquery' ), '1.0', true );
+	}
+
+	/**
+	enqueue_scripts function
+	This function will enqueue the registered scripts
+	*/
+	static function enqueue_scripts() {
+		wp_enqueue_script( 'cws-tags' );
+	}
+
+	/**
 	generate_page function
 	This function will create an area for the tags
 	*/
 	static function create_area() {
 		?>
 		<h3>Tag Space</h3>
-		<a href="#" class="btn" data="<?php echo esc_url(self::get_tags()); ?>">CLICK ME</a>
+		<button href="#" class="btn cws-tags" data="<?php echo esc_url(self::get_tags()); ?>">CLICK ME</button>
 		<?php
 	}
 
