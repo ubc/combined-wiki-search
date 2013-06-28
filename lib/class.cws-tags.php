@@ -42,10 +42,12 @@ class Combined_Wiki_Search_Tags {
 	This function will create an area for the tags
 	*/
 	static function create_area() {
+		$tags_arr = self::get_tags();
 		?>
 		<h3>Tag Space</h3>
-		<button href="#" class="btn cws-tags" data="<?php echo esc_url(self::get_tags()); ?>">CLICK ME</button>
-		<?php
+		<?php foreach( $tags_arr as $tag ): ?>
+			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a>
+		<?php endforeach;
 	}
 
 	/**
@@ -54,18 +56,53 @@ class Combined_Wiki_Search_Tags {
 	@return array
 	*/
 	static function get_tags() {
-		$tags = "http://wiki.ubc.ca/Documentation:UBC_Content_Management_System/UBC_Collab_Theme";
-		//$tags = $test;
-
+		$tags = array(
+			"Documentation:UBC_Content_Management_System/UBC_Collab_Theme", 
+			"Documentation:UBC_Content_Management_System/CLF_Theme"
+		);
+		
 		return $tags;
 	}
 
 	/**
-	pass_info function
-	This function will pass the information contained in the tag as POST data
+	tag_space_generator function
+	This function will generate the area for the tag space and style it accordingly
+	@param array
+	@return void
 	*/
-	static function pass_info() {
+	static function tag_space_generator( $tags ) {
+		foreach( $tags as $tag ): ?>
+			<button href="#" class="btn cws-tags" data="<?php esc_url($tag); ?>"><?php echo $tag; ?></button>
+		<?php endforeach;
+	}
 
+	/**
+	make_url function
+	This function will create a url and put it into the GET parameters based on the page name passed into it
+	if an empty page name is passed, nothing is returned
+	@param string
+	@return string
+	*/
+	static function make_url( $page_name ) {
+		// set the url for the tag
+		if( isset( $page_name ) ):
+			$url_redirect = get_permalink( Combined_Wiki_Search_Pages::$pages['cws_page_' . CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] );
+			$url_redirect = add_query_arg('p', $page_name, $url_redirect );
+			return $url_redirect;
+		endif;
+		return;
+	}
+
+	/**
+	get_tag_name function
+	This function will get the name of the wiki page and return it as a string
+	@param
+	@return string
+	*/
+	static function get_tag_name( $tag ) {
+		$broken_tag = explode( '/', $tag );
+		$tag_name = str_replace( '_', ' ', $broken_tag[sizeof( $broken_tag ) - 1] );
+		return $tag_name;
 	}
 }
 
