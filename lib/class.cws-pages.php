@@ -25,12 +25,14 @@ class Combined_Wiki_Search_Pages {
 	}
 	
 	static function display_wiki_preview() {
+		$wiki_page = $_REQUEST['p'];
+		
 		ob_start();
 		?>
 		Wiki Preview
-		[wiki_embed]
+		[wiki-embed url='<?php echo $wiki_page; ?>' no-edit no-contents no-infobox]
 		<?php
-		return ob_get_clean();
+		return do_shortcode( ob_get_clean() );
 	}
 }
 
