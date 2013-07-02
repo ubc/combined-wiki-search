@@ -7,7 +7,7 @@ class Combined_Wiki_Search_Form {
 	}
 	
 	static function register_script() {
-		wp_register_script( 'cws-form' , plugins_url( 'js/form.js', __FILE__ ), array( 'jquery' ), '1.0', true );
+		wp_register_script( 'cws-form' , trailingslashit( CW_SEARCH_DIR_URL ) . 'js/form.js', array( 'jquery' ), '1.0', true );
 	}
 	
 	static function form_shortcode() {
