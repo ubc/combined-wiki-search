@@ -13,7 +13,7 @@ class Combined_Wiki_Search_Tags {
 	the functionality for the shortcode
 	@return buffer
 	*/
-	static function tags_shortcode() {
+	static function tags_shortcode( $atts = array() ) {
 		ob_start();
 		self::create_area();
 		$buffer = ob_get_contents();
@@ -50,20 +50,32 @@ class Combined_Wiki_Search_Tags {
 			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a><br/>
 		<?php endforeach;
 
-		print_r(self::test_mediawiki_api());
+		$yolo = self::mediawiki_api_builder( 112, "UBC_Content_Management_System" );
+		var_dump( $yolo );
 	}
 
-	static function test_mediawiki_api() {
+	/**
+	mediawiki_api_builder function
+	This function takes 2 parameters and checks to see if they are set, then it
+	returns a JSON decoded array of the results of the mediawiki url api
+	@param int, string
+	@return array
+	*/
+	private static function mediawiki_api_builder( $namespace, $prefix ) {
 		// use JSON for mediawiki api results
 		// want to grab 10 pages in documentation and ubc cms?
-		$mediawiki_api = "api.php?format=json&action=query&generator=allpages&gapnamespace=112&gapprefix=UBC_Content_Management_System&prop=info&inprop=counter";
+		//$mediawiki_api = "api.php?format=json&action=query&generator=allpages&gapnamespace=112&gapprefix=UBC_Content_Management_System&prop=info&inprop=counter";
+		// api.php?action=query&list=allpages&apprefix=UBC_Content_Management_System&apnamespace=112
 		// for testing purposes, site will be hardcoded
-		$mediawiki_site = "http://wiki.ubc.ca/";
+		//$mediawiki_site = Combined_Wiki_Search::$wiki_url;
+		$url = Combined_Wiki_Search::$wiki_url;
+		$url .= "api.php?format=json&action=query&generator=allpages";
+		$url .= isset( $namespace ) && is_int( $namespace ) ? "&gapnamespace=" . $namespace : "";
+		$url .= isset( $prefix ) ? "&gapprefix=" . $prefix : "";
+		$url .= "&prop=info";
 
-		// contains a json encoded array
-		$file = json_decode(file_get_contents( $mediawiki_site . $mediawiki_api ));
-
-		return $file;
+		echo $url . '<br />';
+		return json_decode( file_get_contents( $url ) );
 	}
 
 	/**
