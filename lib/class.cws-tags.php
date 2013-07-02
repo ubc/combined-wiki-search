@@ -42,38 +42,42 @@ class Combined_Wiki_Search_Tags {
 	This function will create an area for the tags
 	*/
 	static function create_area() {
-		$tags_arr = self::get_tags();
+		$tags_arr = self::grab_tags();
 		?>
+		<h3></h3>
 		<h3>Tag Space</h3>
 		<?php foreach( $tags_arr as $tag ): ?>
-			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a>
+			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a><br/>
 		<?php endforeach;
+
+		print_r(self::test_mediawiki_api());
+	}
+
+	static function test_mediawiki_api() {
+		// use JSON for mediawiki api results
+		// want to grab 10 pages in documentation and ubc cms?
+		$mediawiki_api = "api.php?format=json&action=query&generator=allpages&gapnamespace=112&gapprefix=UBC_Content_Management_System&prop=info&inprop=counter";
+		// for testing purposes, site will be hardcoded
+		$mediawiki_site = "http://wiki.ubc.ca/";
+
+		// contains a json encoded array
+		$file = json_decode(file_get_contents( $mediawiki_site . $mediawiki_api ));
+
+		return $file;
 	}
 
 	/**
-	get_tags function
+	grab_tags function
 	This function will generate a list of tags and return an array of the tags
 	@return array
 	*/
-	static function get_tags() {
+	static function grab_tags() {
 		$tags = array(
 			"Documentation:UBC_Content_Management_System/UBC_Collab_Theme", 
 			"Documentation:UBC_Content_Management_System/CLF_Theme"
 		);
-		
-		return $tags;
-	}
 
-	/**
-	tag_space_generator function
-	This function will generate the area for the tag space and style it accordingly
-	@param array
-	@return void
-	*/
-	static function tag_space_generator( $tags ) {
-		foreach( $tags as $tag ): ?>
-			<button href="#" class="btn cws-tags" data="<?php esc_url($tag); ?>"><?php echo $tag; ?></button>
-		<?php endforeach;
+		return $tags;
 	}
 
 	/**
@@ -104,6 +108,7 @@ class Combined_Wiki_Search_Tags {
 		$tag_name = str_replace( '_', ' ', $broken_tag[sizeof( $broken_tag ) - 1] );
 		return $tag_name;
 	}
+
 }
 
 Combined_Wiki_Search_Tags::init();
