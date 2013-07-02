@@ -17,6 +17,7 @@ class Combined_Wiki_Search_Pages {
 				?>
 				--- Search Results ---
 				<?php
+				Combined_Wiki_Search_Results::results();
 			},
 		) );
 		

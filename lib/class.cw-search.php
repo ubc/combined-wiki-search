@@ -1,6 +1,7 @@
 <?php
 class Combined_Wiki_Search {
 	static $wiki_url = null;
+	static $namespaces = array();
 	
 	static function init() {
 		foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
@@ -8,6 +9,8 @@ class Combined_Wiki_Search {
 		endforeach;
 		
 		self::$wiki_url = "http://wiki.ubc.ca/";
+		self::$namespaces = json_decode( file_get_contents( self::$wiki_url . "api.php?action=query&format=json&meta=siteinfo&siprop=namespaces" ) );
+		self::$namespaces = self::$namespaces->query->namespaces;
 	}
 	
 	static function install() {

@@ -6,12 +6,10 @@ class Combined_Wiki_Search_Admin {
 	}
 	
 	static function load() {
-		register_setting( 'cws_options', 'cws_results_page');
-		register_setting( 'cws_options', 'cws_wiki_preview_page');
-		
 		add_settings_section( 'cws_main', 'Main Settings', array( __CLASS__, 'setting_section_main' ), 'cws_settings' );
 		
 		foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
+			register_setting( 'cws_options', $slug );
 			add_settings_field( $slug, $data['title'], array( __CLASS__, 'setting_page' ), 'cws_settings', 'cws_main', $slug );
 		endforeach;
 		
