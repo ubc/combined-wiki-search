@@ -7,10 +7,11 @@ jQuery(document).ready( function() {
 				'action' : 'cws_get_results',
 				'search' : jQuery(this).val(),
 				'compact': true,
+				'limit'  : 3,
 			},
             dataType: "html",
             success: function( response ) {
-                jQuery('.cws-search-form .cws-results').html( response );
+                jQuery('.cws-search-form .cws-autobox').html( response );
             }
         } );
 	} );

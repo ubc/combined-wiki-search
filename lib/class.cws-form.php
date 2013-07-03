@@ -22,9 +22,7 @@ class Combined_Wiki_Search_Form {
 		?>
 		<form class="cws-search-form">
 			<input name="search" placeholder="Ask a question..." />
-			<div class="cws-results">
-				Results
-			</div>
+			<div class="cws-autobox"></div>
 		</form>
 		<?php
 		return ob_get_clean();

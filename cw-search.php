@@ -18,6 +18,7 @@ define( 'CW_SEARCH_DIR_URL',  plugins_url('', CW_SEARCH_BASENAME) );
 define( 'CW_SEARCH_VERSION',  0.1 );
 
 define( 'CW_SEARCH_SETTING_WIKI_URL', "cws_wiki_url" );
+define( 'CW_SEARCH_SETTING_NAMESPACES', "cws_namespaces" );
 define( 'CW_SEARCH_PAGE_SEARCH_RESULTS', "results" );
 define( 'CW_SEARCH_PAGE_WIKI_EMBED', "wikiembed" );
 

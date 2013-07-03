@@ -2,3 +2,65 @@
     font-weight: bold;
     color: darkblue;
 }
+
+.cws-autobox {
+    position: relative;
+    width: 100%;
+}
+
+.cws-autobox .cws-results {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    
+    background: white;
+    border: 3px solid grey;
+}
+
+#page .cws-autobox .cws-section {
+    list-style: none;
+    margin: 0;
+}
+
+.cws-autobox .cws-section > li {
+    margin: 0;
+    border-top: 2px dotted grey;
+}
+
+.cws-autobox .cws-section > li > * {
+    padding: 2%;
+    display: block;
+}
+
+.cws-autobox .cws-link:hover {
+    background: #EEE;
+}
+
+.cws-autobox .cws-section-title {
+    padding: 0 10px;
+    background: grey;
+    color: white;
+    font-weight: bold;
+}
+
+.cws-autobox article {
+    padding: 0;
+    margin: 0;
+    border: none;
+}
+
+.cws-autobox .entry-header {
+    margin: 0;
+}
+
+.cws-autobox .entry-title {
+    font-size: smaller;
+}
+
+.cws-autobox .entry-content {
+    font-size: smaller;
+}
+
+.cws-autobox footer {
+    display: none;
+}

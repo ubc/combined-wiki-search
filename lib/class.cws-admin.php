@@ -14,6 +14,7 @@ class Combined_Wiki_Search_Admin {
 		endforeach;
 		
 		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki URL", array( __CLASS__, 'setting_wiki_url' ), 'cws_settings', 'cws_main' );
+		add_settings_field( CW_SEARCH_SETTING_NAMESPACES, "Namespaces", array( __CLASS__, 'setting_namespaces' ), 'cws_settings', 'cws_main' );
 	}
 	
 	static function admin_menu() {
@@ -41,8 +42,22 @@ class Combined_Wiki_Search_Admin {
 		<?php
 	}
 	
+	static function setting_namespaces( $slug ) {
+		foreach ( Combined_Wiki_Search::$namespaces as $id => $data ):
+			?>
+			<label>
+				<input type="checkbox" name="<?php echo CW_SEARCH_SETTING_NAMESPACES; ?>[]" value="<?php echo $id; ?>" <?php checked(  ); ?>/>
+				<?php echo ( empty( $data->canonical ) ? "Main" : $data->canonical ); ?>
+			</label>
+			<br />
+			<?php
+		endforeach;
+	}
+	
 	static function admin_page() {
 		if ( ! empty( $_POST ) ):
+			print_r( $_POST);
+			
 			foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
 				$value = ( isset( $_POST[$slug] ) ? $_POST[$slug] : 0 );
 				Combined_Wiki_Search_Pages::$pages[$slug]['page_id'] = $value;
@@ -50,7 +65,9 @@ class Combined_Wiki_Search_Admin {
 			endforeach;
 			
 			Combined_Wiki_Search::$wiki_url = $_POST[CW_SEARCH_SETTING_WIKI_URL];
+			Combined_Wiki_Search::$searched_namespaces = $_POST[CW_SEARCH_SETTING_NAMESPACES];
 			update_site_option( CW_SEARCH_SETTING_WIKI_URL, Combined_Wiki_Search::$wiki_url );
+			update_site_option( CW_SEARCH_SETTING_NAMESPACES, Combined_Wiki_Search::$searched_namespaces );
 		endif;
 		?>
 		<div class="wrap">
