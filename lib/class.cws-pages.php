@@ -9,6 +9,19 @@ class Combined_Wiki_Search_Pages {
 		self::load();
 	}
 	
+	static function get_wikiembed_url( $slug, $title = null ) {
+		if ( $title == null ) {
+			$title = $slug;
+		}
+		
+		$url = urlencode( Combined_Wiki_Search::$wiki_url . "?title=" . $title );
+		return get_site_url( "?wikiembed-url=".$url."&wikiembed-title=".$title );
+		
+		/* Old Implementation
+		return get_permalink( Combined_Wiki_Search_Pages::$pages[CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] )."?p=".$data['title'];
+		*/
+	}
+	
 	static function load() {
 		self::add_page( CW_SEARCH_PAGE_SEARCH_RESULTS, array(
 			'title' => "Search Results",
@@ -19,7 +32,7 @@ class Combined_Wiki_Search_Pages {
 					<span class="page-title">Search Results for: <span><?php echo $_REQUEST['search']; ?></span></span>
 				</header>
 				<?php
-				Combined_Wiki_Search_Results::results();
+				Combined_Wiki_Search_Results::results( $_GET['search'] );
 			},
 		) );
 		

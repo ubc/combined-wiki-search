@@ -8,7 +8,7 @@ class Combined_Wiki_Search {
 			Combined_Wiki_Search_Pages::$pages[$slug]['page_id'] = get_site_option( $slug, 0 );
 		endforeach;
 		
-		self::$wiki_url = "http://wiki.ubc.ca/";
+		self::$wiki_url = get_site_option( CW_SEARCH_SETTING_WIKI_URL, "http://wikipedia.org/" );
 		self::$namespaces = json_decode( file_get_contents( self::$wiki_url . "api.php?action=query&format=json&meta=siteinfo&siprop=namespaces" ) );
 		self::$namespaces = self::$namespaces->query->namespaces;
 	}

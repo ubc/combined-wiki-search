@@ -1,50 +1,38 @@
 <?php
 class Combined_Wiki_Search_Results {
 	static function init() {
-		add_action( 'wp_ajax_get_results', array( __CLASS__, 'get_results' ) );
+		add_action( 'wp_ajax_cws_get_results', array( __CLASS__, 'ajax_results' ) );
 		
 		add_action( 'init', array( __CLASS__, 'register_style' ) );
 	}
 	
 	static function register_style() {
-		wp_register_style( 'cws-results' , trailingslashit( CW_SEARCH_DIR_URL ) . 'css/results.css' );
+		wp_register_style( 'cws-results', trailingslashit( CW_SEARCH_DIR_URL ) . 'css/results.css' );
 	}
 	
-	static function results( $data = null, $echo = true ) {
+	static function ajax_results() {
+		self::display( $_POST['data']['search'], true );
+		die();
+	}
+	
+	static function results( $keywords = "" ) {
 		wp_enqueue_style( 'cws-results' );
-		
-		if ( empty( $data ) ):
-			$data = $_REQUEST;
-		endif;
-		
-		$wiki_results = self::get_wiki_results( $data['search'] );
-		$wp_results = query_posts( array(
-			's' => $data['search'],
-		) );
+		self::display( $keywords );
+	}
+	
+	static function display( $keywords = "" , $compact = false ) {
+		$wiki_results = self::get_wiki_results( $keywords );
+		$wp_results = self::get_wp_results( $keywords );
 		
 		?>
-		<div class="cws-results">
+		<div class="cws-results<?php echo ( $compact ? "compact" : "" ); ?>">
 		<?php
-			foreach ( $wiki_results->query->search as $data ):
-				$split = explode( ":", $data->title, 2 );
-				
-				self::result_single( array(
-					'title' => $split[1],
-					'snippet' => $data->snippet,
-					'timestamp' => $data->timestamp,
-					'type' => "Wiki",
-					'category' => Combined_Wiki_Search::$namespaces->{$data->ns}->canonical,
-				) );
+			foreach ( $wiki_results as $data ):
+				self::result_single( $data, $compact );
 			endforeach;
 			
 			foreach ( $wp_results as $data ):
-				self::result_single( array(
-					'title' => $data->post_title,
-					'snippet' => $data->post_excerpt, // Currently this is empty??
-					'timestamp' => $data->post_modified,
-					'type' => $data->post_type,
-					'category' => "???",
-				) );
+				self::result_single( $data, $compact );
 			endforeach;
 		?>
 		</div>
@@ -52,10 +40,6 @@ class Combined_Wiki_Search_Results {
 	}
 	
 	static function result_single( $data ) {
-		$embed_url = get_permalink( Combined_Wiki_Search_Pages::$pages[CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] );
-		$embed_url .= "?p=" . $data['title'];
-		
-		$original_url = Combined_Wiki_Search::$wiki_url . "index.php?title=" . $data['title'];
 		?>
 		<article>
 			<div class="entry-header">
@@ -81,7 +65,45 @@ class Combined_Wiki_Search_Results {
 		$url .= "&srnamespace=112";
 		$url .= "&srsearch=" . $keywords;
 		
-		return json_decode( file_get_contents( $url ) );
+		$response = json_decode( file_get_contents( $url ) );
+		$results = array();
+		
+		foreach ( $response->query->search as $data ):
+			$split = explode( ":", $data->title, 2 );
+			
+			$results[] = array(
+				'title'     => $split[1],
+				'snippet'   => $data->snippet,
+				'timestamp' => $data->timestamp,
+				'type'      => "Wiki",
+				'category'  => Combined_Wiki_Search::$namespaces->{$data->ns}->canonical,
+				'url'       => Combined_Wiki_Search_Pages::get_wikiembed_url( $data['title'] ),
+				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $data['title']
+			);
+		endforeach;
+		
+		return $results;
+	}
+	
+	static function get_wp_results( $keywords ) {
+		$response = query_posts( array(
+			's' => $keywords,
+		) );
+		$results = array();
+		
+		foreach ( $wp_results as $data ):
+			$results[] = array(
+				'title'     => $data->post_title,
+				'snippet'   => $data->post_excerpt, // Currently this is empty??
+				'timestamp' => $data->post_modified,
+				'type'      => $data->post_type,
+				'category'  => "???",
+				'url'       => $data->permalink,
+				'permalink' => $data->permalink,
+			);
+		endforeach;
+		
+		return $results;
 	}
 }
 

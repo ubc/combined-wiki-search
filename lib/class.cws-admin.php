@@ -13,7 +13,7 @@ class Combined_Wiki_Search_Admin {
 			add_settings_field( $slug, $data['title'], array( __CLASS__, 'setting_page' ), 'cws_settings', 'cws_main', $slug );
 		endforeach;
 		
-		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki URL", array( __CLASS__, 'setting_page' ), 'cws_settings', 'cws_main' );
+		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki URL", array( __CLASS__, 'setting_wiki_url' ), 'cws_settings', 'cws_main' );
 	}
 	
 	static function admin_menu() {
@@ -37,7 +37,7 @@ class Combined_Wiki_Search_Admin {
 	
 	static function setting_wiki_url( $slug ) {
 		?>
-		<input name="<?php echo CW_SEARCH_SETTING_WIKI_URL; ?>" value="<?php echo Combined_Wiki_Search::$wiki_url; ?>" />
+		<input type="text" name="<?php echo CW_SEARCH_SETTING_WIKI_URL; ?>" value="<?php echo Combined_Wiki_Search::$wiki_url; ?>" />
 		<?php
 	}
 	
