@@ -14,8 +14,8 @@ class Combined_Wiki_Search_Pages {
 			$title = $slug;
 		}
 		
-		$url = urlencode( Combined_Wiki_Search::$wiki_url . "?title=" . $title );
-		return get_home_url( "?wikiembed-url=".$url."&wikiembed-title=".$title );
+		$url = urlencode( Combined_Wiki_Search::$wiki_url . $slug );
+		return home_url( "?wikiembed-url=".$url."&wikiembed-title=".$title );
 		
 		/* Old Implementation
 		return get_permalink( Combined_Wiki_Search_Pages::$pages[CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] )."?p=".$data['title'];
