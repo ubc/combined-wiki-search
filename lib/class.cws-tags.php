@@ -13,9 +13,10 @@ class Combined_Wiki_Search_Tags {
 	the functionality for the shortcode
 	@return buffer
 	*/
-	static function tags_shortcode( $atts = array() ) {
+	static function tags_shortcode( $atts ) {
+		extract( shortcode_atts( array( 'page_title' => '', 'namespace' => '', 'tag_name' => '' ), $atts ) );
 		ob_start();
-		self::create_area();
+		self::create_area( $page_title, $namespace, $tag_name );
 		$buffer = ob_get_contents();
 		ob_end_clean();
 		return $buffer;
@@ -41,17 +42,20 @@ class Combined_Wiki_Search_Tags {
 	generate_page function
 	This function will create an area for the tags
 	*/
-	static function create_area() {
-		$tags_arr = self::grab_tags();
+	static function create_area( $title, $namespace, $tag_name ) {
+		//$tags_arr = self::grab_tags();
+		//$api_list = self::mediawiki_api_builder( $namespace, $title );
 		?>
 		<h3></h3>
 		<h3>Tag Space</h3>
-		<?php foreach( $tags_arr as $tag ): ?>
+		<?php /*foreach( $tags_arr as $tag ): ?>
 			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a><br/>
-		<?php endforeach;
+		<?php endforeach;*/
+		echo "<p>page_title=" . $title . "<br/>namespace=" . $namespace . "<br/>tag_name=" . $tag_name . "</p>";
 
-		$yolo = self::mediawiki_api_builder( 112, "UBC_Content_Management_System" );
-		var_dump( $yolo );
+		$title = explode( ':', $title );
+		$title = $title[1];
+		$yolo = self::mediawiki_api_builder( 112, $title );
 	}
 
 	/**
@@ -69,12 +73,12 @@ class Combined_Wiki_Search_Tags {
 		// for testing purposes, site will be hardcoded
 		//$mediawiki_site = Combined_Wiki_Search::$wiki_url;
 		$url = Combined_Wiki_Search::$wiki_url;
-		$url .= "api.php?format=json&action=query&generator=allpages";
-		$url .= isset( $namespace ) && is_int( $namespace ) ? "&gapnamespace=" . $namespace : "";
-		$url .= isset( $prefix ) ? "&gapprefix=" . $prefix : "";
+		$url .= "api.php?format=json&action=query&list=allpages&aplimit=100";
+		$url .= isset( $namespace ) && is_int( $namespace ) ? "&apnamespace=" . $namespace : "";
+		$url .= isset( $prefix ) ? "&apprefix=" . $prefix : "";
 		$url .= "&prop=info";
 
-		echo $url . '<br />';
+		echo '<p>' . $url . '</p>';
 		return json_decode( file_get_contents( $url ) );
 	}
 
