@@ -42,20 +42,25 @@ class Combined_Wiki_Search_Tags {
 	generate_page function
 	This function will create an area for the tags
 	*/
-	static function create_area( $title, $namespace, $tag_name ) {
+	static function create_area( $title = null, $namespace, $tag_name = null ) {
 		//$tags_arr = self::grab_tags();
 		//$api_list = self::mediawiki_api_builder( $namespace, $title );
+		$mod_title = explode( ':', $title );
+		$slug = str_replace( ' ', '_', $title );
+		$mod_title = $mod_title[1];
+		//empty( $tag_name ) ? $slug : $tag_name;
+		//$yolo = self::mediawiki_api_builder( 112, $mod_title );
+
+		//echo '<p>' . Combined_Wiki_Search_Pages::get_wikiembed_url( $slug, $mod_title ) . '</p>';
+
+		//print_r( $yolo );
 		?>
-		<h3></h3>
-		<h3>Tag Space</h3>
+		<a class="btn cws-tags" href="<?php echo self::make_url( $slug, $mod_title ); ?>"><?php echo empty( $tag_name ) ? $slug : $tag_name; ?></a><br/>
 		<?php /*foreach( $tags_arr as $tag ): ?>
 			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a><br/>
 		<?php endforeach;*/
-		echo "<p>page_title=" . $title . "<br/>namespace=" . $namespace . "<br/>tag_name=" . $tag_name . "</p>";
+		//echo "<p>page_title=" . $title . "<br/>namespace=" . $namespace . "<br/>tag_name=" . $tag_name . "</p>";
 
-		$title = explode( ':', $title );
-		$title = $title[1];
-		$yolo = self::mediawiki_api_builder( 112, $title );
 	}
 
 	/**
@@ -103,11 +108,12 @@ class Combined_Wiki_Search_Tags {
 	@param string
 	@return string
 	*/
-	static function make_url( $page_name ) {
+	static function make_url( $slug, $title ) {
 		// set the url for the tag
-		if( isset( $page_name ) ):
-			$url_redirect = get_permalink( Combined_Wiki_Search_Pages::$pages['cws_page_' . CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] );
-			$url_redirect = add_query_arg('p', $page_name, $url_redirect );
+		if( isset( $slug ) ):
+			$url_redirect = Combined_Wiki_Search_Pages::get_wikiembed_url( $slug, $title );
+			//$url_redirect = get_permalink( Combined_Wiki_Search_Pages::$pages['cws_page_' . CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] );
+			//$url_redirect = add_query_arg('p', $page_name, $url_redirect );
 			return $url_redirect;
 		endif;
 		return;
