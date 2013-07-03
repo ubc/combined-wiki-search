@@ -11,7 +11,7 @@ class Combined_Wiki_Search_Results {
 	}
 	
 	static function ajax_results() {
-		self::display( $_POST['data']['search'], true );
+		self::display( $_POST['search'], true );
 		die();
 	}
 	
@@ -68,6 +68,8 @@ class Combined_Wiki_Search_Results {
 		$response = wp_remote_get( $url );
 		$response = json_decode( $response['body'] );
 		$results = array();
+		
+		error_log(print_r($response, TRUE));
 		
 		foreach ( $response->query->search as $data ):
 			$split = explode( ":", $data->title, 2 );

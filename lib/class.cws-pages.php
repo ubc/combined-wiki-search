@@ -15,7 +15,7 @@ class Combined_Wiki_Search_Pages {
 		}
 		
 		$url = urlencode( Combined_Wiki_Search::$wiki_url . "?title=" . $title );
-		return get_site_url( "?wikiembed-url=".$url."&wikiembed-title=".$title );
+		return get_home_url( "?wikiembed-url=".$url."&wikiembed-title=".$title );
 		
 		/* Old Implementation
 		return get_permalink( Combined_Wiki_Search_Pages::$pages[CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] )."?p=".$data['title'];
@@ -36,6 +36,7 @@ class Combined_Wiki_Search_Pages {
 			},
 		) );
 		
+		/*
 		self::add_page( CW_SEARCH_PAGE_WIKI_EMBED, array(
 			'title' => "Wiki Viewport",
 			'page_id' => 0,
@@ -72,6 +73,7 @@ class Combined_Wiki_Search_Pages {
 				<?php
 			},
 		) );
+		*/
 	}
 	
 	static function add_page( $slug, $data ) {
