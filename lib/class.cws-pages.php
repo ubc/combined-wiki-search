@@ -15,7 +15,9 @@ class Combined_Wiki_Search_Pages {
 			'page_id' => 0,
 			'content' => function() {
 				?>
-				--- Search Results ---
+				<header class="page-header">
+					<span class="page-title">Search Results for: <span><?php echo $_REQUEST['search']; ?></span></span>
+				</header>
 				<?php
 				Combined_Wiki_Search_Results::results();
 			},

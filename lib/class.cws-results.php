@@ -22,7 +22,6 @@ class Combined_Wiki_Search_Results {
 			's' => $data['search'],
 		) );
 		
-		//print_r($wp_results);
 		?>
 		<div class="cws-results">
 		<?php

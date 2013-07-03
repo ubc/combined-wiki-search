@@ -8,16 +8,17 @@ class Combined_Wiki_Search_Form {
 	
 	static function register_script() {
 		wp_register_script( 'cws-form' , trailingslashit( CW_SEARCH_DIR_URL ) . 'js/form.js', array( 'jquery' ), '1.0', true );
+		wp_register_style( 'cws-form' , trailingslashit( CW_SEARCH_DIR_URL ) . 'css/form.css' );
 	}
 	
-	static function form_shortcode() {
+	static function form_shortcode( $atts ) {
 		wp_enqueue_script( 'cws-form' );
+		wp_enqueue_style( 'cws-form' );
 		
 		ob_start();
 		?>
 		<form class="cws-search-form">
-			Search Form
-			<input name="search" />
+			<input name="search" placeholder="Ask a question..." />
 		</form>
 		<?php
 		return ob_get_clean();
