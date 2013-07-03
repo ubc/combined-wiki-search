@@ -65,7 +65,8 @@ class Combined_Wiki_Search_Results {
 		$url .= "&srnamespace=112";
 		$url .= "&srsearch=" . $keywords;
 		
-		$response = json_decode( file_get_contents( $url ) );
+		$response = wp_remote_get( $url );
+		$response = json_decode( $response['body'] );
 		$results = array();
 		
 		foreach ( $response->query->search as $data ):
@@ -77,8 +78,8 @@ class Combined_Wiki_Search_Results {
 				'timestamp' => $data->timestamp,
 				'type'      => "Wiki",
 				'category'  => Combined_Wiki_Search::$namespaces->{$data->ns}->canonical,
-				'url'       => Combined_Wiki_Search_Pages::get_wikiembed_url( $data['title'] ),
-				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $data['title']
+				'url'       => Combined_Wiki_Search_Pages::get_wikiembed_url( $data->title ),
+				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $data->title
 			);
 		endforeach;
 		
