@@ -12,7 +12,6 @@ class Combined_Wiki_Search_Results {
 	}
 	
 	static function ajax_results() {
-		error_log("Ajax");
 		self::display( $_POST );
 		die();
 	}
@@ -168,12 +167,12 @@ class Combined_Wiki_Search_Results {
 		global $wp_query;
 		
 		if ( ! empty( $_GET['wiki-search'] ) ):
-			print_r( "WIKI SEARCH RESULTS" );
 			$results = self::get_wiki_results( $_GET['wiki-search'] );
 			
 			$wp_query->is_home = false;
 			$wp_query->is_page = false;
 			$wp_query->is_search = true;
+			$wp_query->s = $_GET['wiki-search'];
 			
 			$wp_query->post_count = count( $results );
 			$list = array();
@@ -186,19 +185,16 @@ class Combined_Wiki_Search_Results {
 				$post->post_content = $data['snippet'];
 				$post->post_status = "published";
 				$post->comment_status = "closed";
-				$post->post_modified = $data['time_stamp'];
+				$post->post_modified = $data['timestamp'];
 				$post->post_excerpt = $data['snippet'];
 				$post->post_parent = 0;
 				$post->post_type = $data['type'];
-				$post->post_date = $data['time_stamp'];
-				$post->post_author = $user->ID; // newly created posts are set as if they are created by the admin user
+				$post->post_date = $data['timestamp'];
 				
 				$list[] = $post;
 			endforeach;
 			
-			$wp_query->posts = array( $list );
-			
-			print_r( $wp_query );
+			$wp_query->posts = $list;
 		endif;
 	}
 }
