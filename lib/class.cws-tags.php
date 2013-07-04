@@ -13,13 +13,25 @@ class Combined_Wiki_Search_Tags {
 	the functionality for the shortcode
 	@return buffer
 	*/
-	static function tags_shortcode( $atts ) {
-		extract( shortcode_atts( array( 'page_title' => null, 'tag_name' => null, 'size' => null ), $atts ) );
+	static function tags_shortcode( $atts, $content = null ) {
+		//extract( shortcode_atts( array( 'page_title' => null, 'tag_name' => null, 'size' => null ), $atts ) );
+		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
+		add_shortcode( 'cws_tag', array( __CLASS__, 'nested_tags' ) );
 		ob_start();
-		self::create_area( $page_title, $tag_name, $size );
+		do_shortcode( $content );
 		$buffer = ob_get_contents();
 		ob_end_clean();
 		return $buffer;
+	}
+
+	static function nested_tags( $atts ) {
+		extract( shortcode_atts( array(
+			'title'	=> null,
+			'name'	=> null,
+			'size'	=> null
+			), $atts )
+		);
+		self::create_area( $title, $name, $size );
 	}
 
 	/**
