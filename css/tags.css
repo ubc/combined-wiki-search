@@ -1,3 +1,51 @@
 .cws-tags {
 	text-decoration: none;
 }
+
+.shortcode-warning {
+	background-color: #FCF8E3;
+	border: 1px solid #FBEED5;
+	/*border-radius: 4px;*/
+	margin-top: 20px;
+	margin-bottom: 20px;
+	padding: 8px 35px 8px 14px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.shortcode-warning .warning-text {
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.shortcode-warning .warning-close {
+	line-height: 20px;
+	position: relative;
+	right: -21px;
+	top: -2px;
+}
+
+button.warning-close {
+	background: none repeat scroll 0 0 transparent;
+	border: 0 none;
+	cursor: pointer;
+	padding: 0;
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	vertical-align: middle;
+}
+
+.warning-close {
+	color: #000;
+	float: right;
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 20px;
+	opacity: 0.2;
+	text-shadow: 0 1px 0 #FFF;
+}
+
+.warning-close:hover, .warning-close:focus, .warning-close:active {
+	color: #000;
+	cursor: pointer;
+	opacity: 0.4;
+	text-decoration: none;
+}

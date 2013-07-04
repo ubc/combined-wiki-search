@@ -14,9 +14,9 @@ class Combined_Wiki_Search_Tags {
 	@return buffer
 	*/
 	static function tags_shortcode( $atts ) {
-		extract( shortcode_atts( array( 'page_title' => '', 'namespace' => '', 'tag_name' => '' ), $atts ) );
+		extract( shortcode_atts( array( 'page_title' => null, 'tag_name' => null, 'size' => null ), $atts ) );
 		ob_start();
-		self::create_area( $page_title, $namespace, $tag_name );
+		self::create_area( $page_title, $tag_name, $size );
 		$buffer = ob_get_contents();
 		ob_end_clean();
 		return $buffer;
@@ -44,25 +44,29 @@ class Combined_Wiki_Search_Tags {
 	generate_page function
 	This function will create an area for the tags
 	*/
-	static function create_area( $title = null, $namespace, $tag_name = null ) {
-		//$tags_arr = self::grab_tags();
-		//$api_list = self::mediawiki_api_builder( $namespace, $title );
+	static function create_area( $title = null, $tag_name = null, $size = null ) {
 		$mod_title = explode( ':', $title );
 		$slug = str_replace( ' ', '_', $title );
 		$mod_title = $mod_title[1];
-		//empty( $tag_name ) ? $slug : $tag_name;
-		//$yolo = self::mediawiki_api_builder( 112, $mod_title );
-
-		//echo '<p>' . Combined_Wiki_Search_Pages::get_wikiembed_url( $slug, $mod_title ) . '</p>';
-
-		//print_r( $yolo );
+		empty( $tag_name ) ? $tag_name = self::get_tag_name( $mod_title ) : $tag_name;
+		if( !is_numeric( $size ) || ($size > 12 || $size < 1) ):
 		?>
-		<a class="btn cws-tags" href="<?php echo self::make_url( $slug, $mod_title ); ?>"><?php echo empty( $tag_name ) ? $slug : $tag_name; ?></a><br/>
-		<?php /*foreach( $tags_arr as $tag ): ?>
-			<a class="btn cws-tags" href="<?php echo self::make_url( $tag ); ?>"><?php echo self::get_tag_name( $tag ); ?></a><br/>
-		<?php endforeach;*/
-		//echo "<p>page_title=" . $title . "<br/>namespace=" . $namespace . "<br/>tag_name=" . $tag_name . "</p>";
-
+			<div class="shortcode-warning">
+			<button href="#" class="warning-close" data="warning-close">&times;</button>
+			<div class="warning-text">
+				You have entered <strong>"<?php echo $size; ?>"</strong> as a parameter in the <strong>"<?php echo $tag_name; ?>"</strong> tag shortcode, 
+				please consider entering a <strong>number <?php echo is_numeric( $size ) && ($size > 12 || $size < 1) ? "between 1 and 12" : ""; ?></strong> 
+				as the size will have a defualt value of 1.
+			</div>
+			</div>
+		<?php
+		endif;
+		empty( $size ) ? $size = 1 : !is_numeric( $size ) ? $size = 1 : ($size > 12 || $size < 1) ? $size = 1 : $size;
+		// first checks if the $size parameter is empty, if it is empty, $size is assigned 1
+		// if it is not empty, check if $size is an integer, if yes, leave it alone, otherwise cast it to an int
+		?>
+		<a class="btn cws-tags size<?php echo $size; ?>" href="<?php echo self::make_url( $slug, $mod_title ); ?>"><?php echo $tag_name; ?></a><br/>
+		<?php
 	}
 
 	/**
@@ -72,13 +76,8 @@ class Combined_Wiki_Search_Tags {
 	@param int, string
 	@return array
 	*/
-	private static function mediawiki_api_builder( $namespace, $prefix ) {
+	/*private static function mediawiki_api_builder( $namespace, $prefix ) {
 		// use JSON for mediawiki api results
-		// want to grab 10 pages in documentation and ubc cms?
-		//$mediawiki_api = "api.php?format=json&action=query&generator=allpages&gapnamespace=112&gapprefix=UBC_Content_Management_System&prop=info&inprop=counter";
-		// api.php?action=query&list=allpages&apprefix=UBC_Content_Management_System&apnamespace=112
-		// for testing purposes, site will be hardcoded
-		//$mediawiki_site = Combined_Wiki_Search::$wiki_url;
 		$url = Combined_Wiki_Search::$wiki_url;
 		$url .= "api.php?format=json&action=query&list=allpages&aplimit=100";
 		$url .= isset( $namespace ) && is_int( $namespace ) ? "&apnamespace=" . $namespace : "";
@@ -87,21 +86,21 @@ class Combined_Wiki_Search_Tags {
 
 		echo '<p>' . $url . '</p>';
 		return json_decode( file_get_contents( $url ) );
-	}
+	}*/
 
 	/**
 	grab_tags function
 	This function will generate a list of tags and return an array of the tags
 	@return array
 	*/
-	static function grab_tags() {
+	/*static function grab_tags() {
 		$tags = array(
 			"Documentation:UBC_Content_Management_System/UBC_Collab_Theme", 
 			"Documentation:UBC_Content_Management_System/CLF_Theme"
 		);
 
 		return $tags;
-	}
+	}*/
 
 	/**
 	make_url function
