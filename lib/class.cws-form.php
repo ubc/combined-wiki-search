@@ -20,10 +20,10 @@ class Combined_Wiki_Search_Form {
 		
 		ob_start();
 		?>
-		<form class="cws-search-form">
-			<input name="search" placeholder="Ask a question..." />
+		<div class="cws-search-form">
+			<input class="cws-search-input" name="search" placeholder="Ask a question..." />
 			<div class="cws-autobox"></div>
-		</form>
+		</div>
 		<?php
 		return ob_get_clean();
 	}

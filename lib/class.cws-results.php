@@ -2,8 +2,9 @@
 class Combined_Wiki_Search_Results {
 	static function init() {
 		add_action( 'wp_ajax_cws_get_results', array( __CLASS__, 'ajax_results' ) );
-		
+		add_action( 'wp_ajax_nopriv_cws_get_results', array( __CLASS__, 'ajax_results' ) );
 		add_action( 'init', array( __CLASS__, 'register_style' ) );
+		add_action( 'template_redirect', array( __CLASS__, 'results_page' ) );
 	}
 	
 	static function register_style() {
@@ -11,6 +12,7 @@ class Combined_Wiki_Search_Results {
 	}
 	
 	static function ajax_results() {
+		error_log("Ajax");
 		self::display( $_POST );
 		die();
 	}
@@ -30,23 +32,6 @@ class Combined_Wiki_Search_Results {
 		
 		?>
 		<div class="cws-results<?php echo ( $compact ? " compact" : "" ); ?>">
-			<ul class="cws-wiki-results cws-section">
-				<li class="cws-section-title">WIKI</li>
-				<?php
-					foreach ( $wiki_results as $data ):
-						?>
-						<li class="cws-link">
-							<?php self::result_single( $data, $compact ); ?>
-						</li>
-						<?php
-					endforeach;
-				?>
-				<li class="cws-results-more cws-link">
-					<a href="">
-						see more...
-					</a>
-				</li>
-			</ul>
 			<ul class="cws-wp-results cws-section">
 				<li class="cws-section-title">WORDPRESS</li>
 				<?php
@@ -59,13 +44,34 @@ class Combined_Wiki_Search_Results {
 					endforeach;
 				?>
 				<li class="cws-results-more cws-link">
-					<a href="">
+					<a href="<?php echo home_url( "search/".$keywords ); ?>">
+						see more...
+					</a>
+				</li>
+			</ul>
+			<ul class="cws-wiki-results cws-section">
+				<li class="cws-section-title">WIKI</li>
+				<?php
+					foreach ( $wiki_results as $data ):
+						?>
+						<li class="cws-link">
+							<?php self::result_single( $data, $compact ); ?>
+						</li>
+						<?php
+					endforeach;
+				?>
+				<li class="cws-results-more cws-link">
+					<a href="<?php home_url( "search/".$keywords ); ?>">
 						see more...
 					</a>
 				</li>
 			</ul>
 			<ul class="cws-section">
-				
+				<li class="cws-link">
+					<a href="">
+						Can't find your question? Ask it.
+					</a>
+				</li>
 			</ul>
 		</div>
 		<?php
@@ -134,9 +140,19 @@ class Combined_Wiki_Search_Results {
 		$results = array();
 		
 		foreach ( $response as $data ):
+			$snippet = $data->post_excerpt;
+			
+			if ( empty( $snippet ) ):
+				$snippet = strip_shortcodes( strip_tags( $data->post_content ) );
+			endif;
+			
+			if ( strlen($snippet) > 100 ):
+				$snippet = substr( $snippet, 0, 97 ) . "...";
+			endif;
+			
 			$results[] = array(
 				'title'     => $data->post_title,
-				'snippet'   => $data->post_excerpt, // Currently this is empty??
+				'snippet'   => $snippet,
 				'timestamp' => $data->post_modified,
 				'type'      => $data->post_type,
 				'category'  => "???",
@@ -146,6 +162,44 @@ class Combined_Wiki_Search_Results {
 		endforeach;
 		
 		return $results;
+	}
+	
+	static function results_page() {
+		global $wp_query;
+		
+		if ( ! empty( $_GET['wiki-search'] ) ):
+			print_r( "WIKI SEARCH RESULTS" );
+			$results = self::get_wiki_results( $_GET['wiki-search'] );
+			
+			$wp_query->is_home = false;
+			$wp_query->is_page = false;
+			$wp_query->is_search = true;
+			
+			$wp_query->post_count = count( $results );
+			$list = array();
+			
+			foreach ( $results as $index => $data ):
+				$post = (object) null;
+				$post->ID = 0;
+				$post->post_title = $data['title'];
+				$post->guid = get_site_url()."?wikiembed-url=".urlencode( $data['url'] )."&wikiembed-title=".urlencode( $data['title'] );
+				$post->post_content = $data['snippet'];
+				$post->post_status = "published";
+				$post->comment_status = "closed";
+				$post->post_modified = $data['time_stamp'];
+				$post->post_excerpt = $data['snippet'];
+				$post->post_parent = 0;
+				$post->post_type = $data['type'];
+				$post->post_date = $data['time_stamp'];
+				$post->post_author = $user->ID; // newly created posts are set as if they are created by the admin user
+				
+				$list[] = $post;
+			endforeach;
+			
+			$wp_query->posts = array( $list );
+			
+			print_r( $wp_query );
+		endif;
 	}
 }
 

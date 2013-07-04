@@ -1,5 +1,5 @@
 jQuery(document).ready( function() {
-	jQuery(".cws-search-form input").keyup( function() {
+	jQuery(".cws-search-input").keyup( function() {
 		jQuery.ajax( {
             type: "POST",
             url: cws_ajaxurl,
@@ -11,7 +11,7 @@ jQuery(document).ready( function() {
 			},
             dataType: "html",
             success: function( response ) {
-                jQuery('.cws-search-form .cws-autobox').html( response );
+                jQuery(".cws-search-form .cws-autobox").html( response );
             }
         } );
 	} );
