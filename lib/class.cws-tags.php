@@ -31,7 +31,7 @@ class Combined_Wiki_Search_Tags {
 			'size'	=> null
 			), $atts )
 		);
-		self::create_area( $title, $name, $size );
+		self::create_tag( $title, $name, $size );
 	}
 
 	/**
@@ -53,10 +53,10 @@ class Combined_Wiki_Search_Tags {
 	}
 
 	/**
-	generate_page function
+	create_tag function
 	This function will create an area for the tags
 	*/
-	static function create_area( $title = null, $tag_name = null, $size = null ) {
+	static function create_tag( $title = null, $tag_name = null, $size = null ) {
 		$mod_title = explode( ':', $title );
 		$slug = str_replace( ' ', '_', $title );
 		$mod_title = $mod_title[1];
@@ -77,7 +77,7 @@ class Combined_Wiki_Search_Tags {
 		// first checks if the $size parameter is empty, if it is empty, $size is assigned 1
 		// if it is not empty, check if $size is an integer, if yes, leave it alone, otherwise cast it to an int
 		?>
-		<a class="btn cws-tags size<?php echo $size; ?>" href="<?php echo self::make_url( $slug, $mod_title ); ?>"><?php echo $tag_name; ?></a><br/>
+		<a class="btn cws-tags size<?php echo $size; ?>" href="<?php echo self::make_url( $slug, $mod_title ); ?>"><?php echo $tag_name; ?></a>
 		<?php
 	}
 
