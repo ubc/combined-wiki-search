@@ -3,8 +3,8 @@ class Combined_Wiki_Search_Tags {
 
 	static function init() {
 		add_shortcode( 'cws_tags', array( __CLASS__, 'tags_shortcode' ) );
-		add_action( 'init', array( __CLASS__, 'register_scripts' ) );
-		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts' ) );
+		add_action( 'init', array( __CLASS__, 'register_scripts_styles' ) );
+		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
 	}
 	
 	/**
@@ -26,16 +26,18 @@ class Combined_Wiki_Search_Tags {
 	register_scripts function
 	This function will register the handles for the javascript files needed
 	*/
-	static function register_scripts() {
-		wp_register_script( 'cws-tags' , trailingslashit( CW_SEARCH_DIR_URL ) . 'js/tags.js', array( 'jquery' ), '1.0', true );
+	static function register_scripts_styles() {
+		wp_register_script( 'cws-tags-js' , trailingslashit( CW_SEARCH_DIR_URL ) . 'js/tags.js', array( 'jquery' ), '1.0', true );
+		wp_register_style( 'cws-tags-css' , trailingslashit( CW_SEARCH_DIR_URL ) . 'css/tags.css' );
 	}
 
 	/**
 	enqueue_scripts function
 	This function will enqueue the registered scripts
 	*/
-	static function enqueue_scripts() {
-		wp_enqueue_script( 'cws-tags' );
+	static function enqueue_scripts_styles() {
+		wp_enqueue_script( 'cws-tags-js' );
+		wp_enqueue_style( 'cws-tags-css' );
 	}
 
 	/**
