@@ -1,5 +1,5 @@
-jQuery(document).ready(function($) {
-	$("div.shortcode-warning .warning-close").click( function(){
-		$(this).parent().slideUp();
+jQuery(document).ready(function() {
+	jQuery("div.shortcode-warning .warning-close").click( function(){
+		jQuery(this).parent().slideUp();
 	});
 });
