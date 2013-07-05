@@ -3,11 +3,9 @@ class Combined_Wiki_Search_Tags {
 
 	static function init() {
 		add_shortcode( 'cws_tags', array( __CLASS__, 'tags_shortcode' ) );
+        add_shortcode( 'cws_tag', array( __CLASS__, 'nested_tags' ) );
 		add_action( 'init', array( __CLASS__, 'register_scripts_styles' ) );
-		//add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
-		add_shortcode( 'cws_tag', array( __CLASS__, 'nested_tags' ) );
 		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
-
 	}
 	
 	/**
@@ -17,13 +15,8 @@ class Combined_Wiki_Search_Tags {
 	@return buffer
 	*/
 	static function tags_shortcode( $atts, $content = null ) {
-		//extract( shortcode_atts( array( 'page_title' => null, 'tag_name' => null, 'size' => null ), $atts ) );
 		ob_start();
 		echo do_shortcode( $content );
-		//echo apply_filters( 'the_content', $content );
-		//$buffer = ob_get_contents();
-		//ob_end_clean();
-		//return $buffer;
 		return ob_get_clean();
 	}
 
