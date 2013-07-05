@@ -66,7 +66,7 @@ class Combined_Wiki_Search_Tags {
 			<div class="shortcode-warning">
 			<button href="#" class="warning-close" data="warning-close">&times;</button>
 			<div class="warning-text">
-				You have entered <strong>"<?php echo $size; ?>"</strong> as a parameter in the <strong>"<?php echo $tag_name; ?>"</strong> tag shortcode, 
+				You have entered <strong>"<?php echo $size; ?>"</strong> as the <strong>size</strong> parameter in the <strong>"<?php echo $tag_name; ?>"</strong> tag shortcode, 
 				please consider entering a <strong>number <?php echo is_numeric( $size ) && ($size > 12 || $size < 1) ? "between 1 and 12" : ""; ?></strong> 
 				as the size will have a defualt value of 1.
 			</div>
