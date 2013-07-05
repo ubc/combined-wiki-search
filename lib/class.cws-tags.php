@@ -4,7 +4,10 @@ class Combined_Wiki_Search_Tags {
 	static function init() {
 		add_shortcode( 'cws_tags', array( __CLASS__, 'tags_shortcode' ) );
 		add_action( 'init', array( __CLASS__, 'register_scripts_styles' ) );
+		//add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
+		add_shortcode( 'cws_tag', array( __CLASS__, 'nested_tags' ) );
 		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
+
 	}
 	
 	/**
@@ -15,13 +18,13 @@ class Combined_Wiki_Search_Tags {
 	*/
 	static function tags_shortcode( $atts, $content = null ) {
 		//extract( shortcode_atts( array( 'page_title' => null, 'tag_name' => null, 'size' => null ), $atts ) );
-		add_action( 'wp_footer', array( __CLASS__, 'enqueue_scripts_styles' ) );
-		add_shortcode( 'cws_tag', array( __CLASS__, 'nested_tags' ) );
 		ob_start();
-		do_shortcode( $content );
-		$buffer = ob_get_contents();
-		ob_end_clean();
-		return $buffer;
+		echo do_shortcode( $content );
+		//echo apply_filters( 'the_content', $content );
+		//$buffer = ob_get_contents();
+		//ob_end_clean();
+		//return $buffer;
+		return ob_get_clean();
 	}
 
 	static function nested_tags( $atts ) {
@@ -32,7 +35,9 @@ class Combined_Wiki_Search_Tags {
 			'color'	=> "#000"
 			), $atts )
 		);
-		self::create_tag( $title, $name, $size );
+		ob_start();
+		self::create_tag( $title, $name, $size, $color );
+		return ob_get_clean();
 	}
 
 	/**
@@ -65,12 +70,12 @@ class Combined_Wiki_Search_Tags {
 		if( !is_numeric( $size ) || ($size > 12 || $size < 0) ):
 		?>
 			<div class="shortcode-warning">
-			<button href="#" class="warning-close" data="warning-close">&times;</button>
-			<div class="warning-text">
-				You have entered <strong>"<?php echo $size; ?>"</strong> as the <strong>size</strong> parameter in the <strong>"<?php echo $tag_name; ?>"</strong> tag shortcode, 
-				please consider entering a <strong>number <?php echo is_numeric( $size ) && ($size > 12 || $size < 0) ? "between 0 and 12" : ""; ?></strong> 
-				as the size will have a defualt value of 0 (12px).
-			</div>
+				<button href="#" class="warning-close" data="warning-close">&times;</button>
+				<div class="warning-text">
+					You have entered <strong>"<?php echo $size; ?>"</strong> as the <strong>size</strong> parameter in the <strong>"<?php echo $tag_name; ?>"</strong> tag shortcode, 
+					please consider entering a <strong>number <?php echo is_numeric( $size ) && ($size > 12 || $size < 0) ? "between 0 and 12" : ""; ?></strong> 
+					as the size will have a defualt value of 0 (12px).
+				</div>
 			</div>
 		<?php
 		endif;
@@ -78,8 +83,9 @@ class Combined_Wiki_Search_Tags {
 		// first checks if the $size parameter is empty, if it is empty, $size is assigned 1
 		// if it is not empty, check if $size is an integer, if yes, leave it alone, otherwise cast it to an int
 		?>
-		<a class="btn cws-tags" href="<?php echo self::make_url( $slug, $mod_title ); ?>" data-size="<?php echo $size; ?>" data-color="<?php echo $color; ?>"><?php echo $tag_name; ?></a><br/>
+		<a class="btn cws-tags" href="<?php echo self::make_url( $slug, $mod_title ); ?>" data-size="<?php echo $size; ?>" data-color="<?php echo $color; ?>"><?php echo $tag_name; ?></a>
 		<?php
+
 	}
 
 	/**
