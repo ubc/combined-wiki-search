@@ -103,7 +103,7 @@ class Combined_Wiki_Search_Results {
 		<article class="<?php echo $data['type']; ?>">
 			<div class="entry-header">
 				<span class="entry-title">
-					<a href="<?php echo $embed_url; ?>" title="Permalink to <?php echo $data['title']; ?>" rel="bookmark">
+					<a href="<?php echo $data['url']; ?>" title="Permalink to <?php echo $data['title']; ?>" rel="bookmark">
 						<?php echo $data['title']; ?>
 					</a>
 				</span>
@@ -112,7 +112,7 @@ class Combined_Wiki_Search_Results {
 			<footer class="entry-meta">
 				<?php echo $data['type']; ?> | 
 				This entry was posted in <?php echo $data['category']; ?>, and last modified on 
-				<a href="<?php echo $original_url . "&action=history"; ?>" title="<?php echo date( "g:ia", strtotime( $data->timestamp ) ); ?>" rel="bookmark"><time class="entry-date" datetime="<?php echo $data['timestamp']; ?>"><?php echo date( "F j, Y", strtotime( $data['timestamp'] ) ); ?></time></a>.
+				<a href="<?php echo $data['permalink'] . "&action=history"; ?>" title="<?php echo date( "g:ia", strtotime( $data->timestamp ) ); ?>" rel="bookmark"><time class="entry-date" datetime="<?php echo $data['timestamp']; ?>"><?php echo date( "F j, Y", strtotime( $data['timestamp'] ) ); ?></time></a>.
 			</footer>
 		</article>
 		<?php
@@ -138,6 +138,7 @@ class Combined_Wiki_Search_Results {
 		
 		foreach ( $response->query->search as $data ):
 			$split = explode( ":", $data->title, 2 );
+			$slug = str_replace( ' ', '_', $data->title );
 			
 			$results[] = array(
 				'title'     => $split[1],
@@ -145,8 +146,8 @@ class Combined_Wiki_Search_Results {
 				'timestamp' => $data->timestamp,
 				'type'      => "wiki",
 				'category'  => Combined_Wiki_Search::$namespaces->{$data->ns}->canonical,
-				'url'       => Combined_Wiki_Search::get_wikiembed_url( $data->title ),
-				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $data->title
+				'url'       => Combined_Wiki_Search::get_wikiembed_url( $slug ),
+				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $slug,
 			);
 		endforeach;
 		
