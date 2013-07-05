@@ -3,8 +3,8 @@ class Combined_Wiki_Search_Results {
 	static function init() {
 		add_action( 'wp_ajax_cws_get_results', array( __CLASS__, 'ajax_results' ) );
 		add_action( 'wp_ajax_nopriv_cws_get_results', array( __CLASS__, 'ajax_results' ) );
-		add_action( 'init', array( __CLASS__, 'register_style' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'results_page' ) );
+		add_action( 'init', array( __CLASS__, 'register_style' ) );
 	}
 	
 	static function register_style() {
@@ -28,52 +28,74 @@ class Combined_Wiki_Search_Results {
 		
 		$wiki_results = self::get_wiki_results( $keywords, $limit );
 		$wp_results = self::get_wp_results( $keywords, $limit );
-		
 		?>
 		<div class="cws-results<?php echo ( $compact ? " compact" : "" ); ?>">
-			<ul class="cws-wp-results cws-section">
-				<li class="cws-section-title">WORDPRESS</li>
-				<?php
-					foreach ( $wp_results as $data ):
-						?>
-						<li class="cws-link">
-							<?php self::result_single( $data, $compact ); ?>
-						</li>
-						<?php
-					endforeach;
-				?>
-				<li class="cws-results-more cws-link">
-					<a href="<?php echo home_url( "search/".$keywords ); ?>">
-						see more...
-					</a>
-				</li>
-			</ul>
-			<ul class="cws-wiki-results cws-section">
-				<li class="cws-section-title">WIKI</li>
-				<?php
-					foreach ( $wiki_results as $data ):
-						?>
-						<li class="cws-link">
-							<?php self::result_single( $data, $compact ); ?>
-						</li>
-						<?php
-					endforeach;
-				?>
-				<li class="cws-results-more cws-link">
-					<a href="<?php home_url( "search/".$keywords ); ?>">
-						see more...
-					</a>
-				</li>
-			</ul>
-			<ul class="cws-section">
-				<li class="cws-link">
-					<a href="">
-						Can't find your question? Ask it.
-					</a>
-				</li>
-			</ul>
+			<?php
+				foreach ( $args['structure'] as $data ):
+					self::display_component( $data, $args );
+				endforeach;
+			?>
 		</div>
 		<?php
+	}
+	
+	static function display_component( $args, $atts ) {
+		switch ( $args['code'] ):
+		case 'section':
+			?>
+			<ul class="cws-section">
+				<li class="cws-section-title"><? echo $args['title']; ?></li>
+				<?php
+				foreach ( $args['content'] as $data ):
+					self::display_component( $data, $atts );
+				endforeach;
+				?>
+			</ul>
+			<?php
+			break;
+		case 'results':
+			$keywords = $atts['search'];
+			
+			switch ( $args['type'] ):
+			case 'wordpress':
+				$results = self::get_wp_results( $keywords, 3 );
+				$url = get_home_url( null, "search/".$keywords );
+				break;
+			case 'wiki':
+				$results = self::get_wiki_results( $keywords, 3 );
+				$url = get_home_url( null, "?wiki-search=".$keywords );
+				break;
+			default:
+				return;
+			endswitch;
+			
+			foreach ( $results as $data ):
+				?>
+				<li class="cws-link">
+					<?php self::result_single( $data, $compact ); ?>
+				</li>
+				<?php
+			endforeach;
+			?>
+			<li class="cws-link">
+				<a href="<?php echo $url; ?>">
+					see more...
+				</a>
+			</li>
+			<?php
+			break;
+		case 'link':
+			?>
+			<li class="cws-link">
+				<a href="<?php echo $args['url']; ?>">
+					<?php echo $args['title']; ?>
+				</a>
+			</li>
+			<?php
+			break;
+		default:
+			break;
+		endswitch;
 	}
 	
 	static function result_single( $data ) {
@@ -97,6 +119,10 @@ class Combined_Wiki_Search_Results {
 	}
 	
 	static function get_wiki_results( $keywords, $limit = null ) {
+		if ( empty( $keywords ) ):
+			return array();
+		endif;
+		
 		$url = Combined_Wiki_Search::$wiki_url;
 		$url .= "api.php?action=query&format=json&list=search&srwhat=text&srprop=snippet|timestamp&srredirects=true";
 		$url .= "&srnamespace=112";

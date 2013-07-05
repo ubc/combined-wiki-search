@@ -15,6 +15,7 @@
     
     background: white;
     border: 3px solid grey;
+    box-sizing: border-box;
 }
 
 #page .cws-autobox .cws-section {
@@ -29,7 +30,7 @@
 }
 
 .cws-autobox .cws-section > li > * {
-    padding: 1.5%;
+    padding: 1%;
     display: block;
 }
 
@@ -68,4 +69,8 @@
 
 .cws-autobox footer {
     display: none;
+}
+
+.cws-search-input {
+    box-sizing: border-box;
 }
