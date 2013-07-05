@@ -8,11 +8,6 @@ class Combined_Wiki_Search_Admin {
 	static function load() {
 		add_settings_section( 'cws_main', 'Main Settings', array( __CLASS__, 'setting_section_main' ), 'cws_settings' );
 		
-		foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
-			register_setting( 'cws_options', $slug );
-			add_settings_field( $slug, $data['title'], array( __CLASS__, 'setting_page' ), 'cws_settings', 'cws_main', $slug );
-		endforeach;
-		
 		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki URL", array( __CLASS__, 'setting_wiki_url' ), 'cws_settings', 'cws_main' );
 		add_settings_field( CW_SEARCH_SETTING_NAMESPACES, "Namespaces", array( __CLASS__, 'setting_namespaces' ), 'cws_settings', 'cws_main' );
 	}
@@ -56,8 +51,6 @@ class Combined_Wiki_Search_Admin {
 	
 	static function admin_page() {
 		if ( ! empty( $_POST ) ):
-			print_r( $_POST);
-			
 			foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
 				$value = ( isset( $_POST[$slug] ) ? $_POST[$slug] : 0 );
 				Combined_Wiki_Search_Pages::$pages[$slug]['page_id'] = $value;

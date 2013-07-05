@@ -19,11 +19,8 @@ define( 'CW_SEARCH_VERSION',  0.1 );
 
 define( 'CW_SEARCH_SETTING_WIKI_URL', "cws_wiki_url" );
 define( 'CW_SEARCH_SETTING_NAMESPACES', "cws_namespaces" );
-define( 'CW_SEARCH_PAGE_SEARCH_RESULTS', "results" );
-define( 'CW_SEARCH_PAGE_WIKI_EMBED', "wikiembed" );
 
 // Don't mess with the ordering of these unless you know what you are doing.
-require_once( 'lib/class.cws-pages.php' );
 require_once( 'lib/class.cw-search.php' );
 require_once( 'lib/class.cws-results.php' );
 require_once( 'lib/class.cws-admin.php' );

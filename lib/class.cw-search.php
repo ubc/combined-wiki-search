@@ -5,37 +5,24 @@ class Combined_Wiki_Search {
 	static $searched_namespaces = array();
 	
 	static function init() {
-		foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
-			Combined_Wiki_Search_Pages::$pages[$slug]['page_id'] = get_site_option( $slug, 0 );
-		endforeach;
-		
 		self::$wiki_url = get_site_option( CW_SEARCH_SETTING_WIKI_URL, "http://wikipedia.org/" );
 		self::$searched_namespaces = get_site_option( CW_SEARCH_SETTING_NAMESPACES, array() );
+		
 		self::$namespaces = json_decode( file_get_contents( self::$wiki_url . "api.php?action=query&format=json&meta=siteinfo&siprop=namespaces" ) );
 		self::$namespaces = self::$namespaces->query->namespaces;
 	}
 	
-	static function install() {
-		foreach ( Combined_Wiki_Search_Pages::$pages as $slug => $data ):
-			Combined_Wiki_Search_Pages::$pages[$slug]['page_id'] = self::create_page( $data['title'] );
-		endforeach;
+	static function get_wikiembed_url( $slug, $title = null ) {
+		if ( $title == null ) {
+			$title = $slug;
+		}
+		
+		$url = urlencode( Combined_Wiki_Search::$wiki_url . $slug );
+		return home_url( "?wikiembed-url=".$url."&wikiembed-title=".$title );
 	}
 	
-	static function create_page( $title ) {
-		$id = wp_insert_post( array(
-			'post_type'    => 'page',
-			'post_content' => "",
-			'post_parent'  => 0,
-			'post_author'  => 1,
-			'post_status'  => 'publish',
-			'post_title'   => $title,
-		) );
-		
-		if ( $id == 0 ):
-			error_log( "Failed to create ".$title );
-		endif;
-		
-		return $id;
+	static function get_wiki_search_url( $keywords ) {
+		return home_url( "?wiki-search=".$keywords );
 	}
 }
 

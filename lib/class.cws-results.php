@@ -119,7 +119,7 @@ class Combined_Wiki_Search_Results {
 				'timestamp' => $data->timestamp,
 				'type'      => "wiki",
 				'category'  => Combined_Wiki_Search::$namespaces->{$data->ns}->canonical,
-				'url'       => Combined_Wiki_Search_Pages::get_wikiembed_url( $data->title ),
+				'url'       => Combined_Wiki_Search::get_wikiembed_url( $data->title ),
 				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $data->title
 			);
 		endforeach;
@@ -145,8 +145,8 @@ class Combined_Wiki_Search_Results {
 				$snippet = strip_shortcodes( strip_tags( $data->post_content ) );
 			endif;
 			
-			if ( strlen($snippet) > 100 ):
-				$snippet = substr( $snippet, 0, 97 ) . "...";
+			if ( strlen($snippet) > 200 ):
+				$snippet = substr( $snippet, 0, 197 ) . "...";
 			endif;
 			
 			$results[] = array(
