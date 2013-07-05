@@ -6,7 +6,8 @@ class Combined_Wiki_Search {
 	static $namespaces = null;
 	
 	static function init() {
-		self::$wiki_url = get_site_option( CW_SEARCH_SETTING_WIKI_URL, "http://wikipedia.org/" );
+		self::$wiki_url = get_site_option( CW_SEARCH_SETTING_WIKI_URL, "http://wikipedia.org/wiki/" );
+		self::$wiki_api_url = get_site_option( CW_SEARCH_SETTING_WIKI_API_URL, "http://wikipedia.org/w/api.php" );
 		self::$searched_namespaces = get_site_option( CW_SEARCH_SETTING_NAMESPACES, array() );
 	}
 	
@@ -24,7 +25,11 @@ class Combined_Wiki_Search {
 	}
 	
 	static function get_wiki_api_url() {
-		
+		return self::$wiki_api_url;
+	}
+	
+	static function query_wiki( $args ) {
+		return self::get_wiki_api_url() . "?" . $args;
 	}
 }
 

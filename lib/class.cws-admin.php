@@ -12,11 +12,13 @@ class Combined_Wiki_Search_Admin {
 		self::$wikiembed_enabled = is_plugin_active( "wiki-embed/WikiEmbed.php" );
 		
 		add_settings_section( 'cws_main', 'Main Settings', array( __CLASS__, 'setting_section_main' ), 'cws_settings' );
-		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki URL", array( __CLASS__, 'setting_wiki_url' ), 'cws_settings', 'cws_main' );
+		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki Article URL", array( __CLASS__, 'setting_wiki_article_url' ), 'cws_settings', 'cws_main' );
+		add_settings_field( CW_SEARCH_SETTING_WIKI_API_URL, "Wiki API URL", array( __CLASS__, 'setting_wiki_api_url' ), 'cws_settings', 'cws_main' );
 		add_settings_field( CW_SEARCH_SETTING_NAMESPACES, "Namespaces", array( __CLASS__, 'setting_namespaces' ), 'cws_settings', 'cws_main' );
 		
 		add_settings_section( 'cws_plugins', 'Plugin Integration Status', array( __CLASS__, 'setting_section_plugins' ), 'cws_settings' );
 		add_settings_field( 'wikiembed_found', 'Wiki Embed plugin', array( __CLASS__, 'setting_wikiembed_plugin' ), 'cws_settings', 'cws_plugins' );
+		add_settings_field( 'wiki_api_found', 'MediaWiki API', array( __CLASS__, 'setting_mediawiki_api' ), 'cws_settings', 'cws_plugins' );
 	}
 	
 	static function register_style() {
@@ -33,9 +35,19 @@ class Combined_Wiki_Search_Admin {
 		<?php
 	}
 	
-	static function setting_wiki_url( $slug ) {
+	static function setting_wiki_article_url( $slug ) {
 		?>
 		<input type="text" name="<?php echo CW_SEARCH_SETTING_WIKI_URL; ?>" value="<?php echo Combined_Wiki_Search::$wiki_url; ?>" />
+		<br />
+		<small>The base url for articles on this wiki. Used to get the content of a page for display.</small>
+		<?php
+	}
+	
+	static function setting_wiki_api_url( $slug ) {
+		?>
+		<input type="text" name="<?php echo CW_SEARCH_SETTING_WIKI_API_URL; ?>" value="<?php echo Combined_Wiki_Search::$wiki_api_url; ?>" />
+		<br />
+		<small>The url to MediaWiki's API. This is used to gather the list of namespaces and get search results.</small>
 		<?php
 	}
 	
@@ -43,11 +55,11 @@ class Combined_Wiki_Search_Admin {
 		Combined_Wiki_Search::$namespaces = json_decode( file_get_contents( Combined_Wiki_Search::$wiki_url . "api.php?action=query&format=json&meta=siteinfo&siprop=namespaces" ) );
 		?>
 		<small>
-			Choose which sections of your Wiki you want to this plugin to search.
+			Choose which sections of your Wiki you want to this plugin to search. If no boxes are checked, all areas will be searched.
 		</small>
 		<div class="cws-namespaces">
 			<?php
-			foreach ( Combined_Wiki_Search_Admin::$namespaces->query->namespaces as $id => $data ):
+			foreach ( Combined_Wiki_Search::$namespaces->query->namespaces as $id => $data ):
 				?>
 				<label>
 					<input type="checkbox" name="<?php echo CW_SEARCH_SETTING_NAMESPACES; ?>[]" value="<?php echo $id; ?>" <?php checked( in_array( $id, Combined_Wiki_Search::$searched_namespaces ) ); ?>/>
@@ -74,13 +86,30 @@ class Combined_Wiki_Search_Admin {
 		<?php endif;
 	}
 	
+	public static function setting_mediawiki_api() {
+		$response = Combined_Wiki_Search::query_wiki( "action=query&format=json&meta=siteinfo" );
+		
+		if ( self::$wikiembed_enabled ): ?>
+			<div style="color: green">Enabled</div>
+		<?php else: ?>
+			<div style="color: red">Not Found</div>
+		<?php endif;
+	}
+	
 	static function admin_page() {
 		wp_enqueue_style( 'cws-admin' );
 		
 		if ( ! empty( $_POST ) ):
 			Combined_Wiki_Search::$wiki_url = trailingslashit( $_POST[CW_SEARCH_SETTING_WIKI_URL] );
+			Combined_Wiki_Search::$wiki_api_url = $_POST[CW_SEARCH_SETTING_WIKI_API_URL];
 			Combined_Wiki_Search::$searched_namespaces = $_POST[CW_SEARCH_SETTING_NAMESPACES];
+			
+			if ( empty( Combined_Wiki_Search::$wiki_api_url ) ):
+				Combined_Wiki_Search::$wiki_api_url = Combined_Wiki_Search::$wiki_url . "api.php";
+			endif;
+			
 			update_site_option( CW_SEARCH_SETTING_WIKI_URL, Combined_Wiki_Search::$wiki_url );
+			update_site_option( CW_SEARCH_SETTING_WIKI_API_URL, Combined_Wiki_Search::$wiki_api_url );
 			update_site_option( CW_SEARCH_SETTING_NAMESPACES, Combined_Wiki_Search::$searched_namespaces );
 		endif;
 		?>

@@ -18,6 +18,7 @@ define( 'CW_SEARCH_DIR_URL',  plugins_url('', CW_SEARCH_BASENAME) );
 define( 'CW_SEARCH_VERSION',  0.1 );
 
 define( 'CW_SEARCH_SETTING_WIKI_URL', "cws_wiki_url" );
+define( 'CW_SEARCH_SETTING_WIKI_API_URL', "cws_wiki_api_url" );
 define( 'CW_SEARCH_SETTING_NAMESPACES', "cws_namespaces" );
 
 // Don't mess with the ordering of these unless you know what you are doing.
