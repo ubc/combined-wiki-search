@@ -49,5 +49,3 @@ button.warning-close {
 	text-decoration: none;
 }
 
-/* don't want to create 12 different size options containing only one thing and don't want to use javascript to control the size of the font */
-/* use LESS? */

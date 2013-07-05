@@ -20,7 +20,9 @@ Installation
 Usage
 -----
 
-Once the plugin is enabled, you will need to navigate to the plugin settings. To do this, navigate to `Settings>CW Search` for the settings page. In the settings page, you are able to specify the page which will contain the search results from the `Wiki Search` and you are also able to specify the Wiki that you wish to draw content from.
+Once the plugin is enabled, you will need to navigate to the plugin settings. To do this, navigate to `Settings > CW Search` for the settings page. In the settings page, you are able to specify the page which will contain the search results from the `Wiki Search` and you are also able to specify the Wiki that you wish to draw content from.
+
+*	Please note that with Wikipedia, the URL that should be entered into the URL field is `YOUR_LANGUAGE_HERE.wikipedia.org/wiki/`
 
 1.  Wiki Search
 
@@ -29,10 +31,12 @@ Once the plugin is enabled, you will need to navigate to the plugin settings. To
 To use the Wiki Tags feature, you will need to enter the shortcode into a page/post. For example
 
     [cws_tags]
-      [cws_tag title="Albert Einstein" name="Einstein" size="5"]
+      [cws_tag title="Albert Einstein" name="Einstein" size="5" color="blue" ]
     [/cws_tags]
 
-will create a tag for the Wikipedia page for `Albert Einstein` with the tag name as `Einstein` and a tag size of 5. The two optional parameters in the shortcode are the `name` and `size` parameters. Leaving `name` blank will display the title as the tag name, while leaving the `size` parameter empty will make the tag have a default size of 1.
+will create a tag for the Wikipedia page for `Albert Einstein` with the tag name as `Einstein`, a tag size of 5, and a black colored tag. The optional parameters in the shortcode are the `name`, `size`, and `color` parameters. Leaving `name` blank will display the title as the tag name, leaving the `size` parameter empty will make the tag have a default size of 1, and leaving `color` empty will make the tag color black.
+
+*   Please note that there are only sizes from 0 to 12, where 0 is 12px and 12 is 38px.
 
 Changelog
 ---------

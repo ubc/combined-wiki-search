@@ -28,7 +28,8 @@ class Combined_Wiki_Search_Tags {
 		extract( shortcode_atts( array(
 			'title'	=> null,
 			'name'	=> null,
-			'size'	=> null
+			'size'	=> 0,
+			'color'	=> "#000"
 			), $atts )
 		);
 		self::create_tag( $title, $name, $size );
@@ -56,28 +57,28 @@ class Combined_Wiki_Search_Tags {
 	create_tag function
 	This function will create an area for the tags
 	*/
-	static function create_tag( $title = null, $tag_name = null, $size = null ) {
+	static function create_tag( $title = null, $tag_name = null, $size = 0, $color = "#000" ) {
 		$mod_title = explode( ':', $title );
 		$slug = str_replace( ' ', '_', $title );
 		$mod_title = $mod_title[1];
 		empty( $tag_name ) ? $tag_name = self::get_tag_name( $mod_title ) : $tag_name;
-		if( !is_numeric( $size ) || ($size > 12 || $size < 1) ):
+		if( !is_numeric( $size ) || ($size > 12 || $size < 0) ):
 		?>
 			<div class="shortcode-warning">
 			<button href="#" class="warning-close" data="warning-close">&times;</button>
 			<div class="warning-text">
 				You have entered <strong>"<?php echo $size; ?>"</strong> as the <strong>size</strong> parameter in the <strong>"<?php echo $tag_name; ?>"</strong> tag shortcode, 
-				please consider entering a <strong>number <?php echo is_numeric( $size ) && ($size > 12 || $size < 1) ? "between 1 and 12" : ""; ?></strong> 
-				as the size will have a defualt value of 1.
+				please consider entering a <strong>number <?php echo is_numeric( $size ) && ($size > 12 || $size < 0) ? "between 0 and 12" : ""; ?></strong> 
+				as the size will have a defualt value of 0 (12px).
 			</div>
 			</div>
 		<?php
 		endif;
-		empty( $size ) ? $size = 1 : !is_numeric( $size ) ? $size = 1 : ($size > 12 || $size < 1) ? $size = 1 : $size;
+		empty( $size ) ? $size = 0 : !is_numeric( $size ) ? $size = 0 : ($size > 12 || $size < 0) ? $size = 0 : $size;
 		// first checks if the $size parameter is empty, if it is empty, $size is assigned 1
 		// if it is not empty, check if $size is an integer, if yes, leave it alone, otherwise cast it to an int
 		?>
-		<a class="btn cws-tags size<?php echo $size; ?>" href="<?php echo self::make_url( $slug, $mod_title ); ?>"><?php echo $tag_name; ?></a>
+		<a class="btn cws-tags" href="<?php echo self::make_url( $slug, $mod_title ); ?>" data-size="<?php echo $size; ?>" data-color="<?php echo $color; ?>"><?php echo $tag_name; ?></a><br/>
 		<?php
 	}
 
@@ -124,8 +125,8 @@ class Combined_Wiki_Search_Tags {
 	static function make_url( $slug, $title ) {
 		// set the url for the tag
 		if( isset( $slug ) ):
-			$url_redirect = Combined_Wiki_Search_Pages::get_wikiembed_url( $slug, $title );
-			//$url_redirect = get_permalink( Combined_Wiki_Search_Pages::$pages['cws_page_' . CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] );
+			$url_redirect = Combined_Wiki_Search::get_wikiembed_url( $slug, $title );
+			//$url_redirect = get_permalink( Combined_Wiki_Search::$pages['cws_page_' . CW_SEARCH_PAGE_WIKI_EMBED]['page_id'] );
 			//$url_redirect = add_query_arg('p', $page_name, $url_redirect );
 			return $url_redirect;
 		endif;
