@@ -32,7 +32,7 @@ class Combined_Wiki_Search_Form {
 		self::$form_atts = self::$current;
 		?>
 		<div class="cws-search-form" data-atts='<?php echo json_encode( self::$form_atts ); ?>'>
-			<input class="cws-search-input" name="search" placeholder="Ask a question..." />
+			<input class="cws-search-input" name="search" placeholder="Ask a question..." autocomplete="off" />
 			<div class="cws-autobox"></div>
 		</div>
 		<?php

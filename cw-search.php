@@ -22,9 +22,9 @@ define( 'CW_SEARCH_SETTING_WIKI_API_URL', "cws_wiki_api_url" );
 define( 'CW_SEARCH_SETTING_NAMESPACES', "cws_namespaces" );
 
 // Don't mess with the ordering of these unless you know what you are doing.
+require_once( 'lib/class.cws-admin.php' );
 require_once( 'lib/class.cw-search.php' );
 require_once( 'lib/class.cws-results.php' );
-require_once( 'lib/class.cws-admin.php' );
 require_once( 'lib/class.cws-form.php' );
 require_once( 'lib/class.cws-tags.php' );
 

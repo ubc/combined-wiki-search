@@ -1,7 +1,5 @@
 <?php
 class Combined_Wiki_Search_Admin {
-	static $wikiembed_enabled = false;
-	
 	static function init() {
 		add_action( 'admin_init', array( __CLASS__, 'load' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
@@ -9,14 +7,12 @@ class Combined_Wiki_Search_Admin {
 	}
 	
 	static function load() {
-		self::$wikiembed_enabled = is_plugin_active( "wiki-embed/WikiEmbed.php" );
-		
 		add_settings_section( 'cws_main', 'Main Settings', array( __CLASS__, 'setting_section_main' ), 'cws_settings' );
 		add_settings_field( CW_SEARCH_SETTING_WIKI_URL, "Wiki Article URL", array( __CLASS__, 'setting_wiki_article_url' ), 'cws_settings', 'cws_main' );
 		add_settings_field( CW_SEARCH_SETTING_WIKI_API_URL, "Wiki API URL", array( __CLASS__, 'setting_wiki_api_url' ), 'cws_settings', 'cws_main' );
 		add_settings_field( CW_SEARCH_SETTING_NAMESPACES, "Namespaces", array( __CLASS__, 'setting_namespaces' ), 'cws_settings', 'cws_main' );
 		
-		add_settings_section( 'cws_plugins', 'Plugin Integration Status', array( __CLASS__, 'setting_section_plugins' ), 'cws_settings' );
+		add_settings_section( 'cws_plugins', 'Integration Status', array( __CLASS__, 'setting_section_plugins' ), 'cws_settings' );
 		add_settings_field( 'wikiembed_found', 'Wiki Embed plugin', array( __CLASS__, 'setting_wikiembed_plugin' ), 'cws_settings', 'cws_plugins' );
 		add_settings_field( 'wiki_api_found', 'MediaWiki API', array( __CLASS__, 'setting_mediawiki_api' ), 'cws_settings', 'cws_plugins' );
 	}
@@ -59,14 +55,22 @@ class Combined_Wiki_Search_Admin {
 		</small>
 		<div class="cws-namespaces">
 			<?php
-			foreach ( Combined_Wiki_Search::$namespaces->query->namespaces as $id => $data ):
+			if ( empty( Combined_Wiki_Search::$namespaces->query->namespaces ) ):
 				?>
-				<label>
-					<input type="checkbox" name="<?php echo CW_SEARCH_SETTING_NAMESPACES; ?>[]" value="<?php echo $id; ?>" <?php checked( in_array( $id, Combined_Wiki_Search::$searched_namespaces ) ); ?>/>
-					<?php echo ( empty( $data->canonical ) ? "Main" : $data->canonical ); ?>
-				</label>
+				<div style="color: darkred;">
+					None Found
+				</div>
 				<?php
-			endforeach;
+			else:
+				foreach ( Combined_Wiki_Search::$namespaces->query->namespaces as $id => $data ):
+					?>
+					<label>
+						<input type="checkbox" name="<?php echo CW_SEARCH_SETTING_NAMESPACES; ?>[]" value="<?php echo $id; ?>" <?php checked( in_array( $id, Combined_Wiki_Search::$searched_namespaces ) ); ?>/>
+						<?php echo ( empty( $data->canonical ) ? "Main" : $data->canonical ); ?>
+					</label>
+					<?php
+				endforeach;
+			endif;
 			?>
 		</div>
 		<?php
@@ -74,12 +78,12 @@ class Combined_Wiki_Search_Admin {
 	
 	public static function setting_section_plugins() {
 		?>
-		Integration for the Wiki Embed plugin.
+		Shows the status for integration with MediaWiki and the Wiki-Embed plugin.
 		<?php
 	}
 	
 	public static function setting_wikiembed_plugin() {
-		if ( self::$wikiembed_enabled ): ?>
+		if ( Combined_Wiki_Search::$wikiembed_enabled ): ?>
 			<div style="color: green">Enabled</div>
 		<?php else: ?>
 			<div style="color: red">Not Found</div>
@@ -89,11 +93,35 @@ class Combined_Wiki_Search_Admin {
 	public static function setting_mediawiki_api() {
 		$response = Combined_Wiki_Search::query_wiki( "action=query&format=json&meta=siteinfo" );
 		
-		if ( self::$wikiembed_enabled ): ?>
-			<div style="color: green">Enabled</div>
-		<?php else: ?>
-			<div style="color: red">Not Found</div>
-		<?php endif;
+		if ( is_a( $response, "WP_Error" ) ):
+			?>
+			<div style="color: red">
+				Not Found
+				<?php
+				if ( $response->errors ):
+					?>
+					<br />
+					<div style="color: gray; margin-left: 25px;">
+						<?php
+						foreach ( $response->errors as $error => $messages ):
+							echo $error.": ".implode(', ', $messages);
+						endforeach;
+						?>
+					</div>
+					<?php
+				endif;
+				?>
+			</div>
+			<?php
+		elseif ( ! empty( $response->query->general->sitename ) ):
+			?>
+			<div style="color: green">Connected to <?php echo $response->query->general->sitename; ?></div>
+			<?php
+		else:
+			?>
+			<div style="color: red">Not Found <?php print_r( $response ); ?></div>
+			<?php
+		endif;
 	}
 	
 	static function admin_page() {

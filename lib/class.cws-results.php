@@ -1,9 +1,15 @@
 <?php
 class Combined_Wiki_Search_Results {
+	static $is_wiki_search = false;
+	
 	static function init() {
 		add_action( 'wp_ajax_cws_get_results', array( __CLASS__, 'ajax_results' ) );
 		add_action( 'wp_ajax_nopriv_cws_get_results', array( __CLASS__, 'ajax_results' ) );
+		
 		add_action( 'template_redirect', array( __CLASS__, 'results_page' ) );
+		add_filter( 'the_permalink',     array( __CLASS__, 'results_page_post_link' ) );
+		add_filter( 'get_permalink',     array( __CLASS__, 'results_page_post_link' ) );
+		
 		add_action( 'init', array( __CLASS__, 'register_style' ) );
 	}
 	
@@ -30,6 +36,9 @@ class Combined_Wiki_Search_Results {
 		$wp_results = self::get_wp_results( $keywords, $limit );
 		?>
 		<div class="cws-results<?php echo ( $compact ? " compact" : "" ); ?>">
+			<div class="cws-results-meta">
+				<span><strong>SEARCH RESULTS FOR:</strong> <?php echo $args['search']; ?></span>
+			</div>
 			<?php
 				foreach ( $args['structure'] as $data ):
 					self::display_component( $data, $args );
@@ -69,20 +78,26 @@ class Combined_Wiki_Search_Results {
 				return;
 			endswitch;
 			
-			foreach ( $results as $data ):
+			if ( ! empty( $results ) ):
+				foreach ( $results as $data ):
+					?>
+					<li class="cws-link">
+						<?php self::result_single( $data, $compact ); ?>
+					</li>
+					<?php
+				endforeach;
 				?>
 				<li class="cws-link">
-					<?php self::result_single( $data, $compact ); ?>
+					<a href="<?php echo $url; ?>">
+						see more...
+					</a>
 				</li>
 				<?php
-			endforeach;
-			?>
-			<li class="cws-link">
-				<a href="<?php echo $url; ?>">
-					see more...
-				</a>
-			</li>
-			<?php
+			else:
+				?>
+				<li><small>No Matches</small></li>
+				<?php
+			endif;
 			break;
 		case 'link':
 			?>
@@ -100,21 +115,21 @@ class Combined_Wiki_Search_Results {
 	
 	static function result_single( $data ) {
 		?>
-		<article class="<?php echo $data['type']; ?>">
-			<div class="entry-header">
-				<span class="entry-title">
+		<article class="<?php echo $data['type']; ?> type-<?php echo $data['type']; ?> status-published hentry">
+			<header class="entry-header">
+				<h1 class="entry-title">
 					<a href="<?php echo $data['url']; ?>" title="Permalink to <?php echo $data['title']; ?>" rel="bookmark">
 						<?php echo $data['title']; ?>
 					</a>
-				</span>
-			</div>
-			<div class="entry-content"><?php echo $data['snippet']; ?></div>
+				</h1>
+			</header><!-- .entry-header -->
+			<div class="entry-summary">
+				<p><?php echo $data['snippet']; ?></p>
+			</div><!-- .entry-summary -->
 			<footer class="entry-meta">
-				<?php echo $data['type']; ?> | 
-				This entry was posted in <?php echo $data['category']; ?>, and last modified on 
-				<a href="<?php echo $data['permalink'] . "&action=history"; ?>" title="<?php echo date( "g:ia", strtotime( $data->timestamp ) ); ?>" rel="bookmark"><time class="entry-date" datetime="<?php echo $data['timestamp']; ?>"><?php echo date( "F j, Y", strtotime( $data['timestamp'] ) ); ?></time></a>.
-			</footer>
-		</article>
+				This entry was last modified on <a href="<?php echo $data['permalink'] . "&action=history"; ?>" title="<?php echo date( "g:ia", strtotime( $data->timestamp ) ); ?>" rel="bookmark"><time class="entry-date" datetime="<?php echo $data['timestamp']; ?>"><?php echo date( "F j, Y", strtotime( $data['timestamp'] ) ); ?></time></a>.
+			</footer><!-- .entry-meta -->
+		</article><!-- #post -->
 		<?php
 	}
 	
@@ -123,8 +138,7 @@ class Combined_Wiki_Search_Results {
 			return array();
 		endif;
 		
-		$url = Combined_Wiki_Search::$wiki_url;
-		$url .= "api.php?action=query&format=json&list=search&srwhat=text&srprop=snippet|timestamp&srredirects=true";
+		$url .= "action=query&format=json&list=search&srwhat=text&srprop=snippet|timestamp&srredirects=true";
 		$url .= "&srnamespace=112";
 		$url .= "&srsearch=" . $keywords;
 		
@@ -132,8 +146,7 @@ class Combined_Wiki_Search_Results {
 			$url .= "&srlimit=" . $limit;
 		endif;
 		
-		$response = wp_remote_get( $url );
-		$response = json_decode( $response['body'] );
+		$response = Combined_Wiki_Search::query_wiki( $url );
 		$results = array();
 		
 		foreach ( $response->query->search as $data ):
@@ -144,7 +157,7 @@ class Combined_Wiki_Search_Results {
 				'title'     => $split[1],
 				'snippet'   => $data->snippet,
 				'timestamp' => $data->timestamp,
-				'type'      => "wiki",
+				'type'      => "cws_wiki",
 				'category'  => Combined_Wiki_Search::$namespaces->{$data->ns}->canonical,
 				'url'       => Combined_Wiki_Search::get_wikiembed_url( $slug ),
 				'permalink' => Combined_Wiki_Search::$wiki_url . "index.php?title=" . $slug,
@@ -194,8 +207,10 @@ class Combined_Wiki_Search_Results {
 		global $wp_query;
 		
 		if ( ! empty( $_GET['wiki-search'] ) ):
+			self::$is_wiki_search = true;
 			$results = self::get_wiki_results( $_GET['wiki-search'] );
 			
+			// Old Implementation
 			$wp_query->is_home = false;
 			$wp_query->is_page = false;
 			$wp_query->is_search = true;
@@ -207,8 +222,9 @@ class Combined_Wiki_Search_Results {
 			foreach ( $results as $index => $data ):
 				$post = (object) null;
 				$post->ID = 0;
+				$post->post_name = $data['url'];
 				$post->post_title = $data['title'];
-				$post->guid = get_site_url()."?wikiembed-url=".urlencode( $data['url'] )."&wikiembed-title=".urlencode( $data['title'] );
+				$post->wiki_url = $data['url'];
 				$post->post_content = $data['snippet'];
 				$post->post_status = "published";
 				$post->comment_status = "closed";
@@ -222,7 +238,43 @@ class Combined_Wiki_Search_Results {
 			endforeach;
 			
 			$wp_query->posts = $list;
+			
+			
+			/* Newer Implementation
+			ob_start();
+			foreach ( $results as $index => $data ):
+				self::result_single( $data );
+			endforeach;
+			$content = ob_get_clean();
+			
+			$wp_query->is_home = false;
+			$wp_query->is_page = true;
+			$wp_query->post_count = 1;
+			
+			$post = (object) null;
+			$post->ID = 0;
+			$post->title = "Search Results for: <span>".$_GET['wiki-search']."</span>";
+			$post->guid = get_home_url()."?wiki-search=".urlencode( $_GET['wiki-search'] );
+			$post->post_content = $content;
+			$post->post_status = "published";
+			$post->comment_status = "closed";
+			$post->post_parent = 0;
+			
+			$wp_query->posts = array( $post );
+			$wp_query->queried_object = $post;
+			*/
 		endif;
+	}
+	
+	static function results_page_post_link( $url ) {
+		global $post;
+		
+		if ( $post->post_type == "cws_wiki" ):
+			$url = $post->wiki_url;
+		endif;
+		error_log( $url );
+		
+		return $url;
 	}
 }
 
